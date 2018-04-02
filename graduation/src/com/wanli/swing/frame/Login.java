@@ -56,8 +56,9 @@ public class Login {
 		this.user = new UserBean();
 		userProp = new Properties();
 		saveProp = new Properties();
-		userFile = new File("D:\\Ñ§Ï°\\java\\workspace1\\graduation\\users.properties");
-		saveFile = new File("D:\\Ñ§Ï°\\java\\workspace1\\graduation\\savecount.properties");
+		
+		userFile = new File("users.properties");
+		saveFile = new File("savecount.properties");
 		try {
 			inStream = new FileInputStream(userFile);
 			userProp.load(inStream);
@@ -76,7 +77,7 @@ public class Login {
 		window = new Login();//³õÊ¼»¯
 		Display display = Display.getDefault();
 		Shell shell = new Shell(display, SWT.DIALOG_TRIM);
-		shell.setImage(SWTResourceManager.getImage("D:\\Ñ¸À×ÏÂÔØ\\±ÚÖ½\\1.jpg"));
+		shell.setImage(SWTResourceManager.getImage("image/1.jpg"));
 		shell.setSize(474, 365);
 		center(display, shell);
 		shell.setText("Class For Everyone");
@@ -92,7 +93,7 @@ public class Login {
 		//Í¼Æ¬ÏÔÊ¾Ãæ°å
 		Composite classforeveryone = new Composite(globalLayout, SWT.NONE);
 		classforeveryone.setBounds(0, 0, 469, 154);
-		classforeveryone.setBackgroundImage(SWTResourceManager.getImage("D:\\Ñ¸À×ÏÂÔØ\\±ÚÖ½\\1.jpg"));
+		classforeveryone.setBackgroundImage(SWTResourceManager.getImage("image/1.jpg"));
 
 		//µÇÂ¼Ãæ°å
 		Composite loginComposite = new Composite(globalLayout, SWT.NONE);
@@ -286,7 +287,7 @@ public class Login {
 			}
 		});
 		//ÏÔÊ¾Í¼Æ¬
-		window.setCoverImg(new Image(display, "D:\\Ñ¸À×ÏÂÔØ\\±ÚÖ½\\1.jpg"));
+		window.setCoverImg(new Image(display, "image/1.jpg"));
 
 		shell.open();
 		shell.layout();

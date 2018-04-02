@@ -26,8 +26,8 @@ public class ComboListener implements SelectionListener {
 		this.bRememberMe = bRememberMe;
 		userProp = new Properties();
 		saveProp = new Properties();
-		userFile = new File("D:\\ѧϰ\\java\\workspace1\\graduation\\users.properties");
-		saveFile = new File("D:\\ѧϰ\\java\\workspace1\\graduation\\savecount.properties");
+		userFile = new File("users.properties");
+		saveFile = new File("savecount.properties");
 		try {
 			inStream = new FileInputStream(userFile);
 			userProp.load(inStream);
