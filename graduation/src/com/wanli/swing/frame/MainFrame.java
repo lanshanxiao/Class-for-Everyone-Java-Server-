@@ -57,6 +57,7 @@ import com.wanli.classforereryone.server.MyServer;
 import com.wanli.classforereryone.server.ServerThread;
 import com.wanli.swing.frame.listener.ButtonDownListener;
 import com.wanli.swing.frame.listener.ChartBtnListener;
+import com.wanli.swing.frame.listener.CreateClassListener;
 import com.wanli.swing.frame.listener.HistoryComboListener;
 import com.wanli.swing.frame.listener.TabFordlerListener;
 import com.wanli.swing.service.DBService;
@@ -69,6 +70,7 @@ import org.eclipse.swt.events.SelectionEvent;
 public class MainFrame extends ApplicationWindow {
 	private static String APPNAME = "Class For Everyone";
 	private Shell shell;//主窗口的shell类
+	private Composite parent;
 	private Action newCreate;// 新建
 	private Action openFile;// 打开文件
 	private Action saveFile;// 保存文件
@@ -98,6 +100,7 @@ public class MainFrame extends ApplicationWindow {
 	public static Table scoreTab;//显示成绩表格
 	public static Table historyTab;//显示历史成绩表格
 	public static Combo historyCombo;//所有历史表格的下拉框
+	public static String className;
 	private String userName;// 用户名
 	boolean changes;// 文档是否改变
 	public static String[] questions;// 所有问题
@@ -151,6 +154,7 @@ public class MainFrame extends ApplicationWindow {
 		// 设置窗体标题
 		parent.getShell().setText(APPNAME);
 		shell = parent.getShell();
+		this.parent = parent;
 		// 设置主面板
 		Composite mainFrame = new Composite(parent, SWT.NONE);
 		mainFrame.setLayout(null);
@@ -420,6 +424,7 @@ public class MainFrame extends ApplicationWindow {
 		}
 
 		public void run() {
+			new CreateClassListener(parent);
 			createClass();
 		}
 	}
@@ -443,6 +448,7 @@ public class MainFrame extends ApplicationWindow {
 		}
 
 		public void run() {
+			new CreateClassListener(parent);
 			createClass();
 		}
 	}
@@ -968,10 +974,12 @@ public class MainFrame extends ApplicationWindow {
 	/**
 	 * 创建教室，生成树
 	 */
-	public void createClass() {
-		TreeItem classroom = new TreeItem(tree, SWT.NONE);
-		classroom.setText(userName + number);
-		rooms.add(classroom);
-		number++;
+	public void createClass() {	
+		if (className != null && className != "") {
+			TreeItem classroom = new TreeItem(tree, SWT.NONE);
+			classroom.setText(className);
+			rooms.add(classroom);
+			number++;
+		}
 	}
 }
