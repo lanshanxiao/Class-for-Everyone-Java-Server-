@@ -59,6 +59,7 @@ import com.wanli.swing.frame.listener.ButtonDownListener;
 import com.wanli.swing.frame.listener.ChartBtnListener;
 import com.wanli.swing.frame.listener.CreateClassListener;
 import com.wanli.swing.frame.listener.HistoryComboListener;
+import com.wanli.swing.frame.listener.OnlineTreeListener;
 import com.wanli.swing.frame.listener.TabFordlerListener;
 import com.wanli.swing.service.DBService;
 import com.wanli.thread.ListeningSocket;
@@ -202,6 +203,7 @@ public class MainFrame extends ApplicationWindow {
 
 		// 以树的形式显示在线用户列表
 		tree = new Tree(onlineUser, SWT.BORDER);
+		tree.addMouseListener(new OnlineTreeListener(tree, parent));
 
 		// 设置显示题目，成绩，历史记录等的面板
 		Composite textView = new Composite(mainFrame, SWT.BORDER);

@@ -1,6 +1,8 @@
 package com.wanli.swing.frame.listener;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -58,7 +60,7 @@ class CreateClassShell extends Dialog {
 	}
 	
 	protected void createContents() {
-		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
+		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
         shell.setText("Category Axis");
         shell.setSize(300, 150);
         center(shell.getDisplay(), shell);
@@ -80,9 +82,9 @@ class CreateClassShell extends Dialog {
 		Button confirm = new Button(parent, SWT.NONE);
 		confirm.setText(" 确      认 ");
 		confirm.addSelectionListener(new SelectionListener() {
-			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
+				// 没有输入教室名则弹出提示框
 				if (inputName.getText().trim() == "") {
 					MessageBox messageBox = new MessageBox(parent.getShell());
 					messageBox.setMessage("请输入教室名称");
@@ -98,8 +100,24 @@ class CreateClassShell extends Dialog {
 				
 			}
 		});
+		// 设置窗口默认绑定的按钮为confirm按钮
+		shell.setDefaultButton(confirm);
+		inputName.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyReleased(KeyEvent keyEvent) {
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent keyEvent) {
+				if (keyEvent.keyCode == SWT.CR) {
+					shell.setDefaultButton(confirm);
+				}
+			}
+		});
 		Button cancle = new Button(parent, SWT.NONE);
 		cancle.setText(" 取     消 ");
+		// 设置取消按钮水平右对齐
 		GridData cancleGrid = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		cancle.setLayoutData(cancleGrid);
 		cancle.addSelectionListener(new SelectionListener() {
