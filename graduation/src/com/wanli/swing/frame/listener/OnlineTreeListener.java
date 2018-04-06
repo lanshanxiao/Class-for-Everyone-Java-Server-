@@ -1,5 +1,13 @@
 package com.wanli.swing.frame.listener;
 
+import java.io.PrintWriter;
+import java.text.Collator;
+import java.util.Comparator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TreeEditor;
 import org.eclipse.swt.events.ModifyEvent;
@@ -8,6 +16,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -18,8 +27,11 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.wanli.classforereryone.server.MyServer;
+import com.wanli.swing.entities.OnlineUser;
 import com.wanli.swing.frame.MainFrame;
 
 /**
@@ -69,6 +81,41 @@ public class OnlineTreeListener extends MouseAdapter{
 		        tree.setMenu(menu);
 			} else if(selected.getParentItem() == null) {// 是根节点
 				menu = new Menu(tree);// 为节点建POP UP菜单
+				MenuItem sort = new MenuItem(menu, SWT.PUSH);
+				sort.setText("排序");
+				sort.addSelectionListener(new SelectionListener() {
+					
+					@Override
+					public void widgetSelected(SelectionEvent arg0) {
+						TreeItem[] items = selected.getItems();
+						for (TreeItem item: items) {
+							item.dispose();
+						}
+//						for (Map.Entry<String, OnlineUser> user: MyServer.users.entrySet()) {
+//							try {
+//								System.out.println(user.getKey());
+//								System.out.println(user.getValue().getImei());
+//				            } catch (Exception e) {  
+//				                e.printStackTrace();  
+//				            }
+//						}
+						MyServer.users = sortMapByKey(MyServer.users);
+						for (Map.Entry<String, OnlineUser> user: MyServer.users.entrySet()) {
+							try {
+								TreeItem item = new TreeItem(selected, SWT.NONE);
+								item.setText(user.getKey());
+				            } catch (Exception e) {  
+				                e.printStackTrace();  
+				            }
+						}
+					}
+					
+					@Override
+					public void widgetDefaultSelected(SelectionEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
 				MenuItem rename = new MenuItem(menu, SWT.PUSH);
 				rename.setText("重命名");
 				rename.addSelectionListener(new SelectionAdapter() {
@@ -138,4 +185,26 @@ public class OnlineTreeListener extends MouseAdapter{
 		
 	}
 	
+	public static Map<String, OnlineUser> sortMapByKey(Map<String, OnlineUser> map) {
+        if (map == null || map.isEmpty()) {
+            return null;
+        }
+
+        Map<String, OnlineUser> sortMap = new TreeMap<String, OnlineUser>(
+                new MapKeyComparator());
+
+        sortMap.putAll(map);
+
+        return sortMap;
+    }
+	
+}
+
+class MapKeyComparator implements Comparator<String>{
+
+    @Override
+    public int compare(String str1, String str2) {
+
+        return str1.compareTo(str2);
+    }
 }

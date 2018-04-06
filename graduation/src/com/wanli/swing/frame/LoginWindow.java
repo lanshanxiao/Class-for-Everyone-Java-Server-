@@ -30,15 +30,16 @@ public class LoginWindow {
 	private UserBean user;
 	private Image coverImg;
 
-	/**
-	 * Launch the application.
-	 * 
-	 * @param args
-	 */
+
 	public LoginWindow() {
 		this.user = new UserBean();
 	}
 
+	/**
+	 * Launch the application.
+	 *
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		window = new LoginWindow();
 		Display display = Display.getDefault();
