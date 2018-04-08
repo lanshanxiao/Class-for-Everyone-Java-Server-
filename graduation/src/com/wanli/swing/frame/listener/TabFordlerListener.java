@@ -39,7 +39,7 @@ public class TabFordlerListener extends SelectionAdapter {
 		
 		if (tabFolder.getSelectionIndex() == 1) {
 			MainFrame.refresh.setEnabled(false);
-			MainFrame.chartBtn.setEnabled(false);
+			MainFrame.scoreChartBtn.setEnabled(false);
 			if (MainFrame.scoreTab.getColumnCount() != 0) {
 				int deleteColumn = MainFrame.scoreTab.getColumnCount();
 				int deleteRow = MainFrame.scoreTab.getItemCount();
@@ -52,7 +52,7 @@ public class TabFordlerListener extends SelectionAdapter {
 			}
 			if (MainFrame.tableName != null) {
 				MainFrame.refresh.setEnabled(true);
-				MainFrame.chartBtn.setEnabled(true);
+				MainFrame.scoreChartBtn.setEnabled(true);
 				columnNum = dbService.getTableColumn(MainFrame.tableName);
 				records = dbService.getScoreData(MainFrame.tableName);
 				for (int i = 0; i < columnNum; i++) {

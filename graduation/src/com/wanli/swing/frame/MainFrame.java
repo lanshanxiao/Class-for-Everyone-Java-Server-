@@ -56,8 +56,9 @@ import org.textmining.text.extraction.WordExtractor;
 import com.wanli.classforereryone.server.MyServer;
 import com.wanli.classforereryone.server.ServerThread;
 import com.wanli.swing.frame.listener.ButtonDownListener;
-import com.wanli.swing.frame.listener.ChartBtnListener;
+import com.wanli.swing.frame.listener.ScoreChartBtnListener;
 import com.wanli.swing.frame.listener.CreateClassListener;
+import com.wanli.swing.frame.listener.HistoryCharBtnListener;
 import com.wanli.swing.frame.listener.HistoryComboListener;
 import com.wanli.swing.frame.listener.OnlineTreeListener;
 import com.wanli.swing.frame.listener.TabFordlerListener;
@@ -96,12 +97,12 @@ public class MainFrame extends ApplicationWindow {
 	private Button previous;// 上一题或上一页
 	private Button next;// 下一题或下一页
 	private Button last;// 最后一题或最后一页
-	public static Button refresh;//刷新
-	public static Button chartBtn;//以图表的形式显示数据
+	public static Button refresh;// 刷新
+	public static Button scoreChartBtn;// 以图表的形式显示当前成绩数据
+	public static Button historyCharBtn;// 以图表的形式显示历史成绩数据
 	public static Table scoreTab;//显示成绩表格
 	public static Table historyTab;//显示历史成绩表格
 	public static Combo historyCombo;//所有历史表格的下拉框
-	public static String className;
 	private String userName;// 用户名
 	boolean changes;// 文档是否改变
 	public static String[] questions;// 所有问题
@@ -112,6 +113,9 @@ public class MainFrame extends ApplicationWindow {
 	private DBService dbService;//创建操作dao的业务
 	public static String instruction;//服务器给客户端发送的指令
 	public static String tableName;//表名，用于查询表信息
+	public static String className;//记录创建的教室的名称
+	private Runtime runtime;//获取当前程序的运行时
+	private Process process;//用来存储调用的外部进程
 
 	public MainFrame(String userName) {
 		// 部署窗口
@@ -165,20 +169,34 @@ public class MainFrame extends ApplicationWindow {
 		// 设置创建教室面板
 		Composite createRoom = new Composite(onlineView, SWT.BORDER);
 		createRoom.setBounds(0, 0, onlineView.getSize().x, (int) (onlineView.getSize().y * 0.04));
-		createRoom.setLayout(new FormLayout());
+		createRoom.setLayout(new FillLayout());
 		
 		Button button = new Button(createRoom, SWT.NONE);
-		button.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				ServerThread.sendToClient("开启霸屏");
-//				System.out.println("开启霸屏");
-			}
-		});
 		FormData fd_button = new FormData();
 		fd_button.left = new FormAttachment(0);
 		button.setLayoutData(fd_button);
 		button.setText("\u5F00\u542F\u9738\u5C4F");
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				ServerThread.sendToClient("开启霸屏");
+			}
+		});
+		Button screenshot = new Button(createRoom, SWT.NONE);
+		screenshot.setText("截图");
+		screenshot.setLayoutData(fd_button);
+		screenshot.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				runtime = Runtime.getRuntime();		// 获取当前程序的运行时
+				try {
+					// 执行windows系统自带的截图工具程序，并通过process管理该进程
+					process = runtime.exec("C:\\Windows\\System32\\SnippingTool.exe");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		// 设置显示在线人数面板
 		Composite onlineNum = new Composite(onlineView, SWT.BORDER);
@@ -204,7 +222,7 @@ public class MainFrame extends ApplicationWindow {
 		// 以树的形式显示在线用户列表
 		tree = new Tree(onlineUser, SWT.BORDER);
 		tree.addMouseListener(new OnlineTreeListener(tree, parent));
-
+		
 		// 设置显示题目，成绩，历史记录等的面板
 		Composite textView = new Composite(mainFrame, SWT.BORDER);
 		textView.setBounds((int) (windowWidth * 0.3), 0, (int) (windowWidth * 0.69), onlineView.getSize().y);
@@ -284,8 +302,8 @@ public class MainFrame extends ApplicationWindow {
 			//定义一个刷新表格的按钮
 			refresh = new Button(scoreComp, SWT.NONE);
 			refresh.setText("刷新");
-			chartBtn = new Button(scoreComp, SWT.NONE);
-			chartBtn.setText("图表数据");
+			scoreChartBtn = new Button(scoreComp, SWT.NONE);
+			scoreChartBtn.setText("图表数据");
 		}
 
 		// 定义第三个选项卡
@@ -296,7 +314,7 @@ public class MainFrame extends ApplicationWindow {
 			Composite historyComp = new Composite(tabFolder, SWT.BORDER);
 			history.setControl(historyComp);
 			//设置该面板的布局为网格布局，设置成两列
-			historyComp.setLayout(new GridLayout(2, false));
+			historyComp.setLayout(new GridLayout(3, false));
 			//添加一个面板，用来放置表格
 			Composite tableComp = new Composite(historyComp, SWT.BORDER);
 			//设置tableComp面板的布局为充满式布局
@@ -310,7 +328,7 @@ public class MainFrame extends ApplicationWindow {
 			//为socreTableComp面板设置一个控制布局的对象GridTab2，设置该面板在水平、垂直两个方向全充满
 			GridData gridTab3 = new GridData(GridData.FILL_BOTH);
 			//设置socreTableComp面板垂直占两列
-			gridTab3.horizontalSpan = 2;
+			gridTab3.horizontalSpan = 3;
 			tableComp.setLayoutData(gridTab3);
 
 			//定义一个Label控件
@@ -323,6 +341,8 @@ public class MainFrame extends ApplicationWindow {
 			historyCombo.setLayoutData(moduleGrid);
 			//为下拉框添加监听事件
 			historyCombo.addSelectionListener(new HistoryComboListener(historyCombo));
+			historyCharBtn = new Button(historyComp, SWT.NONE);
+			historyCharBtn.setText("图表数据");
 		}
 
 		// 为选项卡添加监听事件
@@ -337,7 +357,8 @@ public class MainFrame extends ApplicationWindow {
 		next.addSelectionListener(new ButtonDownListener("next"));
 		last.addSelectionListener(new ButtonDownListener("last"));
 		refresh.addSelectionListener(new ButtonDownListener("refresh"));
-		chartBtn.addSelectionListener(new ChartBtnListener(parent));
+		scoreChartBtn.addSelectionListener(new ScoreChartBtnListener(parent));
+		historyCharBtn.addSelectionListener(new HistoryCharBtnListener(parent));
 
 		parent.getShell().addControlListener(new ControlListener() {
 
@@ -976,12 +997,12 @@ public class MainFrame extends ApplicationWindow {
 	/**
 	 * 创建教室，生成树
 	 */
-	public void createClass() {	
+	public void createClass() {
 		if (className != null && className != "") {
 			TreeItem classroom = new TreeItem(tree, SWT.NONE);
 			classroom.setText(className);
 			rooms.add(classroom);
-			number++;
+			number++;			
 		}
 	}
 }

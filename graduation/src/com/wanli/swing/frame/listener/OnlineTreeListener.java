@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import com.wanli.classforereryone.server.MyServer;
 import com.wanli.swing.entities.OnlineUser;
 import com.wanli.swing.frame.MainFrame;
+import com.wanli.thread.ListeningSocket;
 
 /**
  * 为tree控件添加鼠标事件
@@ -100,10 +101,12 @@ public class OnlineTreeListener extends MouseAdapter{
 //				            }
 //						}
 						MyServer.users = sortMapByKey(MyServer.users);
+						ListeningSocket.onlineUsers.clear();
 						for (Map.Entry<String, OnlineUser> user: MyServer.users.entrySet()) {
 							try {
 								TreeItem item = new TreeItem(selected, SWT.NONE);
 								item.setText(user.getKey());
+								ListeningSocket.onlineUsers.put(user.getKey(), item);
 				            } catch (Exception e) {  
 				                e.printStackTrace();  
 				            }

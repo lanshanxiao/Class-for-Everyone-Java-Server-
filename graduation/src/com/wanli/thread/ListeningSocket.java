@@ -14,7 +14,7 @@ import com.wanli.swing.frame.MainFrame;
 public class ListeningSocket implements Runnable  {
 
 	private int socketNum = 0;
-	private Map<String, TreeItem> onlineUsers = new HashMap<>();
+	public static Map<String, TreeItem> onlineUsers = new HashMap<>();
 	
 	public ListeningSocket() {
 		socketNum = MyServer.users.size();

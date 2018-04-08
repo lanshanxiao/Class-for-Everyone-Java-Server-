@@ -1,11 +1,9 @@
-package com.wanli.swing.frame.listener;
+package com.wanli.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
@@ -18,25 +16,11 @@ import org.swtchart.ISeries.SeriesType;
 import com.wanli.swing.frame.MainFrame;
 import com.wanli.swing.service.DBService;
 
-public class ChartBtnListener implements SelectionListener {
-	private Composite parent;
-	public ChartBtnListener(Composite parent) {
-		this.parent = parent;
-	}
-	
-	@Override
-	public void widgetDefaultSelected(SelectionEvent arg0) {
-	}
+public class CharTableUtil extends Dialog {
 
-	@Override
-	public void widgetSelected(SelectionEvent arg0) {
-		new ChartTableShell(parent.getShell()).open();
-	}
-}
-
-class ChartTableShell extends Dialog {
 	protected Object result;
 	protected Shell shell;
+	private String tableName;
 	private DBService dbService;//查询数据库，获取表数据
 	private List<String[]> records;//将查询的表数据存入该对象
 	private List<Double> listA = new ArrayList<>();//统计所有答案各题中A选项的个数
@@ -51,8 +35,9 @@ class ChartTableShell extends Dialog {
 	private int columnNum = 0;//统计表的列的个数
 	private String[] questionNo;//存储题目编号，用于横轴显示
 	
-	public ChartTableShell(Shell parent) {
+	public CharTableUtil(Shell parent, String tableName) {
 		super(parent, SWT.NONE);
+		this.tableName = tableName;
 		dbService = new DBService();
 	}
 	
@@ -121,8 +106,8 @@ class ChartTableShell extends Dialog {
 	 * 统计表格数据，构造用于制作图表的数据
 	 */
 	protected void StatisticalQuantities() {
-		columnNum = dbService.getTableColumn(MainFrame.tableName);
-		records = dbService.getScoreData(MainFrame.tableName);
+		columnNum = dbService.getTableColumn(tableName);
+		records = dbService.getScoreData(tableName);
 		questionNo = new String[columnNum - 1];
 		int A = 0;
 		int B = 0;
