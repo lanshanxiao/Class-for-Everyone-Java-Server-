@@ -8,8 +8,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import com.wanli.swing.frame.MainFrame;
 import com.wanli.swing.service.DBService;
+import com.wanli.utils.StaticVariable;
 
 public class ButtonDownListener extends SelectionAdapter {
 
@@ -31,52 +31,52 @@ public class ButtonDownListener extends SelectionAdapter {
 	protected void selected(SelectionEvent e) {
 		switch (btnName) {
 		case "first":
-			MainFrame.index = 1;
-			MainFrame.text.setText(MainFrame.questions[MainFrame.index]);
+			StaticVariable.index = 1;
+			StaticVariable.text.setText(StaticVariable.questions[StaticVariable.index]);
 			break;
 		case "previous":
-			if (MainFrame.index > 1) {
-				MainFrame.index -= 1;				
+			if (StaticVariable.index > 1) {
+				StaticVariable.index -= 1;				
 			}
-			MainFrame.text.setText(MainFrame.questions[MainFrame.index]);
+			StaticVariable.text.setText(StaticVariable.questions[StaticVariable.index]);
 			break;
 		case "next":
-			if (MainFrame.index < MainFrame.questions.length - 1) {
-				MainFrame.index += 1;				
+			if (StaticVariable.index < StaticVariable.questions.length - 1) {
+				StaticVariable.index += 1;				
 			}
-			MainFrame.text.setText(MainFrame.questions[MainFrame.index]);
+			StaticVariable.text.setText(StaticVariable.questions[StaticVariable.index]);
 			break;
 		case "last":
-			MainFrame.index = MainFrame.questions.length - 1;
-			MainFrame.text.setText(MainFrame.questions[MainFrame.index]);
+			StaticVariable.index = StaticVariable.questions.length - 1;
+			StaticVariable.text.setText(StaticVariable.questions[StaticVariable.index]);
 			break;
 		case "refresh":
-			if (MainFrame.scoreTab.getColumnCount() != 0) {
-				int deleteColumn = MainFrame.scoreTab.getColumnCount();
-				int deleteRow = MainFrame.scoreTab.getItemCount();
+			if (StaticVariable.scoreTab.getColumnCount() != 0) {
+				int deleteColumn = StaticVariable.scoreTab.getColumnCount();
+				int deleteRow = StaticVariable.scoreTab.getItemCount();
 				for (int i = 0; i < deleteRow; i++) {
-					MainFrame.scoreTab.remove(0);
+					StaticVariable.scoreTab.remove(0);
 				}
 				for (int i = 0; i < deleteColumn; i++) {
-					MainFrame.scoreTab.getColumn(0).dispose();
+					StaticVariable.scoreTab.getColumn(0).dispose();
 				}
 			}
-			if (MainFrame.tableName != null) {
-				columnNum = dbService.getTableColumn(MainFrame.tableName);
-				records = dbService.getScoreData(MainFrame.tableName);
+			if (StaticVariable.tableName != null) {
+				columnNum = dbService.getTableColumn(StaticVariable.tableName);
+				records = dbService.getScoreData(StaticVariable.tableName);
 				for (int i = 0; i < columnNum; i++) {
 					if (i == 0) {
-						TableColumn Column_name = new TableColumn(MainFrame.scoreTab, SWT.NONE);
+						TableColumn Column_name = new TableColumn(StaticVariable.scoreTab, SWT.NONE);
 						Column_name.setText("用户名");
 						Column_name.setWidth(100);						
 					} else {
-						TableColumn Column_name = new TableColumn(MainFrame.scoreTab, SWT.NONE);
+						TableColumn Column_name = new TableColumn(StaticVariable.scoreTab, SWT.NONE);
 						Column_name.setText("题" + i);
 						Column_name.setWidth(100);
 					}
 				}
 				for (String[] record: records) {
-					new TableItem(MainFrame.scoreTab, SWT.NONE).setText(record);
+					new TableItem(StaticVariable.scoreTab, SWT.NONE).setText(record);
 				}
 			}
 			break;

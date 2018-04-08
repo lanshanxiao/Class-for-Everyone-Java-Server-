@@ -1,12 +1,8 @@
 package com.wanli.swing.frame.listener;
 
-import java.io.PrintWriter;
-import java.text.Collator;
 import java.util.Comparator;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TreeEditor;
@@ -27,13 +23,10 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
-import com.wanli.classforereryone.server.MyServer;
 import com.wanli.swing.entities.OnlineUser;
-import com.wanli.swing.frame.MainFrame;
-import com.wanli.thread.ListeningSocket;
+import com.wanli.utils.StaticVariable;
 
 /**
  * 为tree控件添加鼠标事件
@@ -92,21 +85,13 @@ public class OnlineTreeListener extends MouseAdapter{
 						for (TreeItem item: items) {
 							item.dispose();
 						}
-//						for (Map.Entry<String, OnlineUser> user: MyServer.users.entrySet()) {
-//							try {
-//								System.out.println(user.getKey());
-//								System.out.println(user.getValue().getImei());
-//				            } catch (Exception e) {  
-//				                e.printStackTrace();  
-//				            }
-//						}
-						MyServer.users = sortMapByKey(MyServer.users);
-						ListeningSocket.onlineUsers.clear();
-						for (Map.Entry<String, OnlineUser> user: MyServer.users.entrySet()) {
+						StaticVariable.users = sortMapByKey(StaticVariable.users);
+						StaticVariable.onlineUsers.clear();
+						for (Map.Entry<String, OnlineUser> user: StaticVariable.users.entrySet()) {
 							try {
 								TreeItem item = new TreeItem(selected, SWT.NONE);
 								item.setText(user.getKey());
-								ListeningSocket.onlineUsers.put(user.getKey(), item);
+								StaticVariable.onlineUsers.put(user.getKey(), item);
 				            } catch (Exception e) {  
 				                e.printStackTrace();  
 				            }
@@ -175,8 +160,8 @@ public class OnlineTreeListener extends MouseAdapter{
 		        		messageBox.setText("删除教室");
 		        		messageBox.setMessage("确定要删除这个教室吗？");
 		        		if (messageBox.open() == SWT.YES) {
-		        			MainFrame.rooms.remove(selected);
-		        			System.out.println(MainFrame.rooms.size());
+		        			StaticVariable.rooms.remove(selected);
+		        			System.out.println(StaticVariable.rooms.size());
 			        		selected.dispose();
 		        		}
 		        	}

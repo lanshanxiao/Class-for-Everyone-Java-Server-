@@ -4,8 +4,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 
-import com.wanli.swing.frame.MainFrame;
 import com.wanli.utils.CharTableUtil;
+import com.wanli.utils.StaticVariable;
 
 public class ScoreChartBtnListener implements SelectionListener {
 	private Composite parent;
@@ -19,7 +19,7 @@ public class ScoreChartBtnListener implements SelectionListener {
 
 	@Override
 	public void widgetSelected(SelectionEvent arg0) {
-		new CharTableUtil(parent.getShell(), MainFrame.tableName).open();
+		new CharTableUtil(parent.getShell(), StaticVariable.tableName).open();
 	}
 }
 

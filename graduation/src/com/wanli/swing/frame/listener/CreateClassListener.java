@@ -54,7 +54,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.wanli.swing.frame.MainFrame;
+import com.wanli.utils.StaticVariable;
 
 /**
  * 新建教室对话框
@@ -126,7 +126,7 @@ class CreateClassShell extends Dialog {
 					messageBox.setMessage("请输入教室名称");
 					messageBox.open();
 				} else {
-					MainFrame.className = inputName.getText();
+					StaticVariable.className = inputName.getText();
 					shell.dispose();
 				}
 			}
@@ -160,7 +160,7 @@ class CreateClassShell extends Dialog {
 			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				MainFrame.className = "";
+				StaticVariable.className = "";
 				shell.dispose();
 			}
 			

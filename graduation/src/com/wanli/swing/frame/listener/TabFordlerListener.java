@@ -5,21 +5,18 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.TreeItem;
 
-import com.wanli.swing.frame.MainFrame;
 import com.wanli.swing.service.DBService;
+import com.wanli.utils.StaticVariable;
 
 public class TabFordlerListener extends SelectionAdapter {
 
-	private TabFolder tabFolder;//选项卡
-	private Combo historyCombo;//显示历史成绩表的下拉框
+	private TabFolder tabFolder;// 选项卡
+	private Combo historyCombo;// 显示历史成绩表的下拉框
 	private DBService dbService;
 	private List<String[]> records;
 	private int columnNum = 0;
@@ -31,43 +28,43 @@ public class TabFordlerListener extends SelectionAdapter {
 	}
 	
 	@Override
-    public void widgetSelected(final SelectionEvent e) { //匿名类
+    public void widgetSelected(final SelectionEvent e) { // 匿名类
         handle_tabFolder_widgetSelected(e);
     }
 	
 	protected void handle_tabFolder_widgetSelected(final SelectionEvent e) {
 		
 		if (tabFolder.getSelectionIndex() == 1) {
-			MainFrame.refresh.setEnabled(false);
-			MainFrame.scoreChartBtn.setEnabled(false);
-			if (MainFrame.scoreTab.getColumnCount() != 0) {
-				int deleteColumn = MainFrame.scoreTab.getColumnCount();
-				int deleteRow = MainFrame.scoreTab.getItemCount();
+			StaticVariable.refresh.setEnabled(false);
+			StaticVariable.scoreChartBtn.setEnabled(false);
+			if (StaticVariable.scoreTab.getColumnCount() != 0) {
+				int deleteColumn = StaticVariable.scoreTab.getColumnCount();
+				int deleteRow = StaticVariable.scoreTab.getItemCount();
 				for (int i = 0; i < deleteRow; i++) {
-					MainFrame.scoreTab.remove(0);
+					StaticVariable.scoreTab.remove(0);
 				}
 				for (int i = 0; i < deleteColumn; i++) {
-					MainFrame.scoreTab.getColumn(0).dispose();
+					StaticVariable.scoreTab.getColumn(0).dispose();
 				}
 			}
-			if (MainFrame.tableName != null) {
-				MainFrame.refresh.setEnabled(true);
-				MainFrame.scoreChartBtn.setEnabled(true);
-				columnNum = dbService.getTableColumn(MainFrame.tableName);
-				records = dbService.getScoreData(MainFrame.tableName);
+			if (StaticVariable.tableName != null) {
+				StaticVariable.refresh.setEnabled(true);
+				StaticVariable.scoreChartBtn.setEnabled(true);
+				columnNum = dbService.getTableColumn(StaticVariable.tableName);
+				records = dbService.getScoreData(StaticVariable.tableName);
 				for (int i = 0; i < columnNum; i++) {
 					if (i == 0) {
-						TableColumn Column_name = new TableColumn(MainFrame.scoreTab, SWT.NONE);
+						TableColumn Column_name = new TableColumn(StaticVariable.scoreTab, SWT.NONE);
 						Column_name.setText("用户名");
 						Column_name.setWidth(100);						
 					} else {
-						TableColumn Column_name = new TableColumn(MainFrame.scoreTab, SWT.NONE);
+						TableColumn Column_name = new TableColumn(StaticVariable.scoreTab, SWT.NONE);
 						Column_name.setText("题" + i);
 						Column_name.setWidth(100);
 					}
 				}
 				for (String[] record: records) {
-					new TableItem(MainFrame.scoreTab, SWT.NONE).setText(record);
+					new TableItem(StaticVariable.scoreTab, SWT.NONE).setText(record);
 				}
 			}
 			

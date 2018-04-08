@@ -55,7 +55,7 @@ public class CharTableUtil extends Dialog {
 	
 	protected void createContents() {
 		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
-        shell.setText("Category Axis");
+        shell.setText("图表");
         shell.setSize(800, 300);
         shell.setLayout(new FillLayout());
         createChart(shell);
@@ -67,10 +67,10 @@ public class CharTableUtil extends Dialog {
         Chart chart = new Chart(parent, SWT.NONE);
 
         //设置图表标题
-        chart.getTitle().setText("Category Axis");
+        chart.getTitle().setText("成绩统计");
         // 设置图表的横轴标题和纵轴标题
-        chart.getAxisSet().getXAxis(0).getTitle().setText("Month");
-        chart.getAxisSet().getYAxis(0).getTitle().setText("Amplitude");
+        chart.getAxisSet().getXAxis(0).getTitle().setText("题");
+        chart.getAxisSet().getYAxis(0).getTitle().setText("个数");
 
         // 设置横轴坐标名称
         for (int i = 1; i <= columnNum - 1; i++) {

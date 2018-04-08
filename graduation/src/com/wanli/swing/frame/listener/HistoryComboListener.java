@@ -9,8 +9,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import com.wanli.swing.frame.MainFrame;
 import com.wanli.swing.service.DBService;
+import com.wanli.utils.StaticVariable;
 
 public class HistoryComboListener implements SelectionListener {
 
@@ -31,31 +31,31 @@ public class HistoryComboListener implements SelectionListener {
 	@Override
 	public void widgetSelected(SelectionEvent arg0) {
 		String tableName = historyCombo.getText();
-		if (MainFrame.historyTab.getColumnCount() != 0) {
-			int deleteColumn = MainFrame.historyTab.getColumnCount();
-			int deleteRow = MainFrame.historyTab.getItemCount();
+		if (StaticVariable.historyTab.getColumnCount() != 0) {
+			int deleteColumn = StaticVariable.historyTab.getColumnCount();
+			int deleteRow = StaticVariable.historyTab.getItemCount();
 			for (int i = 0; i < deleteRow; i++) {
-				MainFrame.historyTab.remove(0);
+				StaticVariable.historyTab.remove(0);
 			}
 			for (int i = 0; i < deleteColumn; i++) {
-				MainFrame.historyTab.getColumn(0).dispose();
+				StaticVariable.historyTab.getColumn(0).dispose();
 			}
 		}
 		int columnNum = dbService.getTableColumn(tableName);
 		List<String[]> records = dbService.getScoreData(tableName);
 		for (int i = 0; i < columnNum; i++) {
 			if (i == 0) {
-				TableColumn Column_name = new TableColumn(MainFrame.historyTab, SWT.NONE);
+				TableColumn Column_name = new TableColumn(StaticVariable.historyTab, SWT.NONE);
 				Column_name.setText("用户名");
 				Column_name.setWidth(100);						
 			} else {
-				TableColumn Column_name = new TableColumn(MainFrame.historyTab, SWT.NONE);
+				TableColumn Column_name = new TableColumn(StaticVariable.historyTab, SWT.NONE);
 				Column_name.setText("题" + i);
 				Column_name.setWidth(100);
 			}
 		}
 		for (String[] record: records) {
-			new TableItem(MainFrame.historyTab, SWT.NONE).setText(record);
+			new TableItem(StaticVariable.historyTab, SWT.NONE).setText(record);
 		}
 	}
 

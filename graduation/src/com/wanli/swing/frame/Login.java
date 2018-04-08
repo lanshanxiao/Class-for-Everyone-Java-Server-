@@ -34,20 +34,20 @@ import com.wanli.swing.entities.UserBean;
 import com.wanli.swing.frame.listener.ComboListener;
 
 public class Login {
-	private static String username;//登陆的用户名
-	private static String password;//登陆的密码
-	private static Text textPassword;//输入密码的文本控件
-	private static Login window;//当前类的引用
-	private static UserBean user;//用户信息的bean
-	private static Image coverImg;//图片
-	private static Properties userProp;//读取保存的登录信息，用于下拉列表框显示
-	private static Properties saveProp;//读取保存的登录信息，用于显示上一次退出时的帐号
-	private static FileInputStream inStream;//输入流，读取信息
-	private static FileWriter writer;//输出流，写信息
-	private static File userFile;//读取保存用户信息的文件
-	private static File saveFile;//读取保存上一次退出时帐号的信息
-	private static Set<Object> itSet;//保存所有信息
-	private static Iterator keys;//用于遍历所有信息
+	private static String username;				// 登陆的用户名
+	private static String password;				// 登陆的密码
+	private static Text textPassword;			// 输入密码的文本控件
+	private static Login window;				// 当前类的引用
+	private static UserBean user;				// 用户信息的bean
+	private static Image coverImg;				// 图片
+	private static Properties userProp;			// 读取保存的登录信息，用于下拉列表框显示
+	private static Properties saveProp;			// 读取保存的登录信息，用于显示上一次退出时的帐号
+	private static FileInputStream inStream;		// 输入流，读取信息
+	private static FileWriter writer;			// 输出流，写信息
+	private static File userFile;				// 读取保存用户信息的文件
+	private static File saveFile;				// 读取保存上一次退出时帐号的信息
+	private static Set<Object> itSet;			// 保存所有信息
+	private static Iterator keys;				// 用于遍历所有信息
 
 	/**
 	 * 初始化属性
@@ -69,12 +69,12 @@ public class Login {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		itSet = userProp.keySet();//将获取的信息转为set
+		itSet = userProp.keySet();// 将获取的信息转为set
 		keys = itSet.iterator();
 	}
 
 	public static void main(String[] args) {
-		window = new Login();//初始化
+		window = new Login();// 初始化
 		Display display = Display.getDefault();
 		Shell shell = new Shell(display, SWT.DIALOG_TRIM);
 		shell.setImage(SWTResourceManager.getImage("image/1.jpg"));
@@ -82,47 +82,45 @@ public class Login {
 		center(display, shell);
 		shell.setText("Class For Everyone");
 
-		//窗体整体面板
+		// 窗体整体面板
 		Composite globalLayout = new Composite(shell, SWT.NONE);
 		globalLayout.setLocation(0, 0);
 		globalLayout.setSize(527, 338);
 		globalLayout.setLayout(null);
-		// window.set(new Image(display, "E:\\迅雷下载\\壁纸\\【10.21】每周精选壁纸\\6.jpg"));
-		// composite.setBackgroundImage(window.getHeadImg());
 
-		//图片显示面板
+		// 图片显示面板
 		Composite classforeveryone = new Composite(globalLayout, SWT.NONE);
 		classforeveryone.setBounds(0, 0, 469, 154);
 		classforeveryone.setBackgroundImage(SWTResourceManager.getImage("image/1.jpg"));
 
-		//登录面板
+		// 登录面板
 		Composite loginComposite = new Composite(globalLayout, SWT.NONE);
 		loginComposite.setBounds(0, 152, 469, 186);
 
-		//输入用户名，用下拉框显示历史登录信息
+		// 输入用户名，用下拉框显示历史登录信息
 		Combo comboUser = new Combo(loginComposite, SWT.NONE);
 		comboUser.setBounds(162, 24, 202, 32);
 		
-		//密码输入框
+		// 密码输入框
 		textPassword = new Text(loginComposite, SWT.BORDER | SWT.PASSWORD);
 		textPassword.setBounds(162, 55, 202, 25);
 		
-		//复选框，保存密码
+		// 复选框，保存密码
 		Button bRememberMe = new Button(loginComposite, SWT.CHECK);
 		bRememberMe.setBounds(162, 93, 92, 28);
 		bRememberMe.setForeground(SWTResourceManager.getColor(240, 248, 255));
 		bRememberMe.setText("\u8BB0\u4F4F\u5BC6\u7801");
 		
-		//复选框，自动登录
+		// 复选框，自动登录
 		Button bAutoLogin = new Button(loginComposite, SWT.CHECK);
 		bAutoLogin.setBounds(280, 93, 84, 28);
 		bAutoLogin.setForeground(SWTResourceManager.getColor(240, 248, 255));
 		bAutoLogin.setText("\u81EA\u52A8\u767B\u5F55");
 		
-		//为下拉框添加点击事件
+		// 为下拉框添加点击事件
 		comboUser.addSelectionListener(new ComboListener(comboUser, bRememberMe));
 		
-		//将获取的信息全部添加到下拉框显示
+		// 将获取的信息全部添加到下拉框显示
 		while (keys.hasNext()) {
 			comboUser.add((String)keys.next());
 		}
@@ -142,11 +140,11 @@ public class Login {
 			}
 		}
 
-		//注册帐号链接
+		// 注册帐号链接
 		Link linkRegist = new Link(loginComposite, SWT.NONE);
 		linkRegist.setBounds(370, 24, 72, 25);
 		linkRegist.setText("<a>\u6CE8\u518C\u8D26\u53F7</a>");
-		//为超链接添加点击事件
+		// 为超链接添加点击事件
 		linkRegist.addMouseListener(new MouseListener() {
 
 			@Override
@@ -158,7 +156,7 @@ public class Login {
 			public void mouseDown(MouseEvent arg0) {
 				URI uri = null;
 				try {
-					//点击后跳转到注册页面
+					// 点击后跳转到注册页面
 					uri = new URI("http://localhost:8090/graduation/regist.jsp");
 					Desktop dtp = Desktop.getDesktop();
 					dtp.browse(uri);
@@ -176,11 +174,11 @@ public class Login {
 
 		});
 
-		//忘记密码超链接
+		// 忘记密码超链接
 		Link linkForget = new Link(loginComposite, SWT.NONE);
 		linkForget.setBounds(370, 55, 72, 25);
 		linkForget.setText("<a>\u627E\u56DE\u5BC6\u7801</a>");
-		//为超链接添加点击事件
+		// 为超链接添加点击事件
 		linkForget.addMouseListener(new MouseListener() {
 
 			@Override
@@ -192,7 +190,7 @@ public class Login {
 			public void mouseDown(MouseEvent arg0) {
 				URI uri = null;
 				try {
-					//点击超链接后跳转到找回密码页面
+					// 点击超链接后跳转到找回密码页面
 					uri = new URI("http://localhost:8090/graduation/forgetPassword.jsp");
 					Desktop dtp = Desktop.getDesktop();
 					dtp.browse(uri);
@@ -210,28 +208,28 @@ public class Login {
 
 		});
 
-		//登录按钮
+		// 登录按钮
 		Button bLogin = new Button(loginComposite, SWT.NONE);
 		bLogin.setBounds(162, 137, 202, 27);
 		bLogin.setText("\u767B\u5F55");
 
-		//登录用户头像
+		// 登录用户头像
 		Composite composite = new Composite(loginComposite, SWT.NONE);
 		composite.setBounds(32, 24, 98, 97);
 
-		//为登录按钮添加点击事件
+		// 为登录按钮添加点击事件
 		bLogin.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				//获取登录的用户名和密码
+				// 获取登录的用户名和密码
 				window.getUser().setName(comboUser.getText());
 				window.getUser().setPassword(textPassword.getText());
 				RegistDao dao = new RegistDao();
-				//查找数据库确认该用户是否存在，存在则执行保存帐号操作和打开主界面
+				// 查找数据库确认该用户是否存在，存在则执行保存帐号操作和打开主界面
 				if (dao.getUserByNameAndPassword(window.getUser().getName(), window.getUser().getPassword())) {
-					//清空保存上一次登录信息的文件，保存这次的登录信息
+					// 清空保存上一次登录信息的文件，保存这次的登录信息
 					saveProp.clear();
-					//判断保存密码复选框是否选中，选中则一起保存密码，否则只保存帐号
+					// 判断保存密码复选框是否选中，选中则一起保存密码，否则只保存帐号
 					if (bRememberMe.getSelection()) {
 						userProp.setProperty(comboUser.getText(), textPassword.getText());
 						saveProp.setProperty(comboUser.getText(), textPassword.getText());
@@ -272,7 +270,7 @@ public class Login {
 						}
 					}
 					shell.dispose();
-					//打开主界面
+					// 打开主界面
 					new MainFrame(window.getUser().getName()).run();
 				} else {
 					MessageBox messageBox = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
@@ -286,7 +284,7 @@ public class Login {
 
 			}
 		});
-		//显示图片
+		// 显示图片
 		window.setCoverImg(new Image(display, "image/1.jpg"));
 
 		shell.open();
@@ -300,13 +298,6 @@ public class Login {
 
 	}
 	
-	
-	
-//	public static void setIntValue(String key, int value) {
-//		String v = Integer.toString(value);
-//		sProperties.setProperty(key, v);
-//	}
-
 	/**
 	 * 设置窗口位于屏幕中间
 	 * 
