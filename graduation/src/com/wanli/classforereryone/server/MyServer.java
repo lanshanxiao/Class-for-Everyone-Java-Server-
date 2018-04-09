@@ -12,11 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.wanli.swing.entities.OnlineUser;
+import com.wanli.utils.StaticVariable;
 
 public class MyServer implements Runnable {
 
 	//定义保存所有Socket的Map
-	public static Map<String, OnlineUser> users = new HashMap<>();
+//	public static Map<String, OnlineUser> users = new HashMap<>();
 	private ServerSocket ss = null;
 	
 	public MyServer() {
@@ -40,7 +41,7 @@ public class MyServer implements Runnable {
 			if (s != null) {
 				System.out.println("客户端连接成功！！！");
 				try {
-					users.put(s.getInetAddress().toString().substring(1), new OnlineUser(s));
+					StaticVariable.users.put(s.getInetAddress().toString().substring(1), new OnlineUser(s));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

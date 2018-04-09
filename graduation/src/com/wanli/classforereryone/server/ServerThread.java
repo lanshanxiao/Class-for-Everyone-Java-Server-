@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.wanli.swing.entities.OnlineUser;
 import com.wanli.swing.frame.MainFrame;
+import com.wanli.utils.StaticVariable;
 
 public class ServerThread implements Runnable {
 
@@ -19,7 +20,7 @@ public class ServerThread implements Runnable {
 	BufferedReader br = null;
 	//接收连接上服务端的客户端imei号
 	private static String ipAddress = "";
-	public static String quitSocket = "";
+//	public static String quitSocket = "";
 	
 	public ServerThread(Socket s) throws IOException {
 		this.s = s;
@@ -34,20 +35,20 @@ public class ServerThread implements Runnable {
 		//采用循环不断从Socket中读取客户端发送过来的数据
 		while ((content = readFromClient()) != null) {
 			String[] info = content.split(",");
-			MyServer.users.get(s.getInetAddress().toString().substring(1)).setInetAddress(s.getInetAddress().toString().substring(1));
-			MyServer.users.get(s.getInetAddress().toString().substring(1)).setUsername(info[0]);
-			MyServer.users.get(s.getInetAddress().toString().substring(1)).setImei(info[1]);
+			StaticVariable.users.get(s.getInetAddress().toString().substring(1)).setInetAddress(s.getInetAddress().toString().substring(1));
+			StaticVariable.users.get(s.getInetAddress().toString().substring(1)).setUsername(info[0]);
+			StaticVariable.users.get(s.getInetAddress().toString().substring(1)).setImei(info[1]);
 			ipAddress = s.getInetAddress().toString().substring(1);
 			System.out.println(ipAddress);
 			if (info.length == 3) {
-				MyServer.users.get(s.getInetAddress().toString().substring(1)).setContent(info[2]);
+				StaticVariable.users.get(s.getInetAddress().toString().substring(1)).setContent(info[2]);
 				System.out.println(info[0] + "," + info[1] + "," + info[2]);				
 			}
 		}
 		//跳出循环，表明该Socket对应的客户端已经关闭
 		//删除该Socket
-		quitSocket = s.getInetAddress().toString().substring(1);
-		MyServer.users.remove(s.getInetAddress().toString().substring(1));
+		StaticVariable.quitSocket = s.getInetAddress().toString().substring(1);
+		StaticVariable.users.remove(s.getInetAddress().toString().substring(1));
 	}
 
 	//定义读取客户端数据的方法
@@ -62,7 +63,7 @@ public class ServerThread implements Runnable {
 	
 	//向客户端发送消息
 	public static void sendToClient(String msg) {
-		for (Map.Entry<String, OnlineUser> user: MyServer.users.entrySet()) {
+		for (Map.Entry<String, OnlineUser> user: StaticVariable.users.entrySet()) {
 			try {
 				System.out.println(msg);
 				OnlineUser val = user.getValue(); 
