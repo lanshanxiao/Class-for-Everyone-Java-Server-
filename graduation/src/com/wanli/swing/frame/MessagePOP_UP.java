@@ -10,6 +10,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+import com.wanli.utils.StaticVariable;
+
 public class MessagePOP_UP {
 
 	protected Shell shell;

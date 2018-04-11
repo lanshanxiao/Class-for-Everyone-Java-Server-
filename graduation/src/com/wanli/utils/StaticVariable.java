@@ -2,6 +2,7 @@ package com.wanli.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.custom.StyledText;
@@ -9,7 +10,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeItem;
 
 import com.wanli.swing.entities.OnlineUser;
@@ -37,5 +40,7 @@ public class StaticVariable {
 	public static String tableName;									// 表名，用于查询数据库中的表数据
 	public static String className;									// 记录创建的教室的名称
 	public static Map<String, TreeItem> onlineUsers = new HashMap<>();// 显示所有在线人数的Tree
-
+	public static TabItem askQuestion;
+	public static int unanswerNum = 0;
+	public static Map<TableItem, Boolean> unanswerMap = new HashMap<>(); 
 }

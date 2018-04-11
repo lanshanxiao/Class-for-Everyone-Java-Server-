@@ -30,6 +30,7 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -58,6 +59,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import com.wanli.classforereryone.server.MyServer;
 import com.wanli.classforereryone.server.ServerThread;
+import com.wanli.swing.frame.listener.AskQuestionTableListener;
 import com.wanli.swing.frame.listener.ButtonDownListener;
 import com.wanli.swing.frame.listener.CreateClassListener;
 import com.wanli.swing.frame.listener.HistoryCharBtnListener;
@@ -182,6 +184,15 @@ public class MainFrame extends ApplicationWindow {
 				}
 			}
 		});
+//		Button messBtn = new Button(createRoom, SWT.NONE);
+//		messBtn.setText("提问");
+//		messBtn.setLayoutData(fd_button);
+//		messBtn.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent arg0) {
+//				new AskQuestionTableListener(parent);
+//			}
+//		});
 
 		// 设置显示在线人数面板
 		Composite onlineNum = new Composite(onlineView, SWT.BORDER);
@@ -331,13 +342,15 @@ public class MainFrame extends ApplicationWindow {
 		}
 		
 		// 定义第四个选项卡
-		final TabItem askQuestion = new TabItem(tabFolder, SWT.NONE);
-		askQuestion.setText("提问");
+//		final TabItem askQuestion = new TabItem(tabFolder, SWT.NONE);
+		StaticVariable.askQuestion = new TabItem(tabFolder, SWT.NONE);
+		StaticVariable.askQuestion.setText("提问");
+		
 		{
 			//为该选项卡添加一个面板
 			Composite questionComp = new Composite(tabFolder, SWT.BORDER);
 			questionComp.setLayout(new FillLayout());
-			askQuestion.setControl(questionComp);
+			StaticVariable.askQuestion.setControl(questionComp);
 			//设置该面板的布局为网格布局，设置成两列
 			questionComp.setLayout(new FillLayout());
 			//定义一张表格
@@ -347,12 +360,13 @@ public class MainFrame extends ApplicationWindow {
 			// 设置网格线可见
 			StaticVariable.askQuestions.setLinesVisible(true);
 			// 定义表中的列
-			TableColumn nameColumn = new TableColumn(StaticVariable.askQuestions, SWT.NONE);
-			nameColumn.setText("学生");
-			nameColumn.setWidth(150);
+//			TableColumn nameColumn = new TableColumn(StaticVariable.askQuestions, SWT.NONE);
+//			nameColumn.setText("学生");
+//			nameColumn.setWidth(150);
 			TableColumn questionColumn = new TableColumn(StaticVariable.askQuestions, SWT.NONE);
 			questionColumn.setText("问题");
 			questionColumn.setWidth(textView.getSize().x);
+			StaticVariable.askQuestions.addMouseListener(new AskQuestionTableListener(parent));
 		}
 		
 		// 为选项卡添加监听事件
