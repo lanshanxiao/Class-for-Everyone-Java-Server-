@@ -17,11 +17,11 @@ import com.wanli.utils.StaticVariable;
 public class MyServer implements Runnable {
 
 	//定义保存所有Socket的Map
-//	public static Map<String, OnlineUser> users = new HashMap<>();
 	private ServerSocket ss = null;
 	
 	public MyServer() {
 		try {
+			// 设置要连接该服务器的应用的端口号
 			ss = new ServerSocket(30000);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -31,7 +31,7 @@ public class MyServer implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			//此行代码会阻塞，将一直等待别人的连接
+			// 此行代码会阻塞，将一直等待别人的连接
 			Socket s = null;
 			try {
 				s = ss.accept();
@@ -41,6 +41,7 @@ public class MyServer implements Runnable {
 			if (s != null) {
 				System.out.println("客户端连接成功！！！");
 				try {
+					// 有客户端连接就把连接的客户端使用map存储
 					StaticVariable.users.put(s.getInetAddress().toString().substring(1), new OnlineUser(s));
 				} catch (IOException e) {
 					e.printStackTrace();

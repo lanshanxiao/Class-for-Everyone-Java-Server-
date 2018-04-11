@@ -7,6 +7,7 @@ import java.util.Map;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TreeItem;
@@ -15,6 +16,7 @@ import com.wanli.swing.entities.OnlineUser;
 
 public class StaticVariable {
 	
+	public static Composite parent;									// 主窗体的Composite类
 	public static Map<String, OnlineUser> users = new HashMap<>();	// 保存所有Socket的Map
 	public static String quitSocket = "";							// 记录断开连接的socket，用来移除TreeItem
 	public static String onlineNumsStr = "在线人数：";					// 显示在线人数
@@ -26,6 +28,7 @@ public class StaticVariable {
 	public static Button historyCharBtn;							// 以图表的形式显示历史成绩数据
 	public static Table scoreTab;									// 显示成绩表格
 	public static Table historyTab;									// 显示历史成绩表格
+	public static Table askQuestions;								// 显示学生提出的问题
 	public static Combo historyCombo;								// 所有历史表格的下拉框
 	public static String[] questions;								// 保存所有问题
 	public static int index = 1;									// 标记第几题

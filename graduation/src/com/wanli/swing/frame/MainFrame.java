@@ -25,6 +25,8 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -50,6 +52,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
@@ -70,7 +73,6 @@ public class MainFrame extends ApplicationWindow {
 	private static String APPNAME = "Class For Everyone";	// 当前软件的名称
 	private static String welcome = "欢迎您，";				// 显示欢迎提示
 	private Shell shell;									// 主窗口的shell类
-	private Composite parent;								// 主窗体的Composite类
 	private Action newCreate;								// 新建教室
 	private Action openFile;								// 打开文件
 	private Action saveFile;								// 保存文件
@@ -142,7 +144,7 @@ public class MainFrame extends ApplicationWindow {
 		// 设置窗体标题
 		parent.getShell().setText(APPNAME);
 		shell = parent.getShell();
-		this.parent = parent;
+		StaticVariable.parent = parent;
 		// 设置主面板
 		Composite mainFrame = new Composite(parent, SWT.NONE);
 		mainFrame.setLayout(null);
@@ -327,7 +329,32 @@ public class MainFrame extends ApplicationWindow {
 			StaticVariable.historyCharBtn = new Button(historyComp, SWT.NONE);
 			StaticVariable.historyCharBtn.setText("图表数据");
 		}
-
+		
+		// 定义第四个选项卡
+		final TabItem askQuestion = new TabItem(tabFolder, SWT.NONE);
+		askQuestion.setText("提问");
+		{
+			//为该选项卡添加一个面板
+			Composite questionComp = new Composite(tabFolder, SWT.BORDER);
+			questionComp.setLayout(new FillLayout());
+			askQuestion.setControl(questionComp);
+			//设置该面板的布局为网格布局，设置成两列
+			questionComp.setLayout(new FillLayout());
+			//定义一张表格
+			StaticVariable.askQuestions = new Table(questionComp, SWT.MULTI);
+			// 设置表头可见
+			StaticVariable.askQuestions.setHeaderVisible(true);
+			// 设置网格线可见
+			StaticVariable.askQuestions.setLinesVisible(true);
+			// 定义表中的列
+			TableColumn nameColumn = new TableColumn(StaticVariable.askQuestions, SWT.NONE);
+			nameColumn.setText("学生");
+			nameColumn.setWidth(150);
+			TableColumn questionColumn = new TableColumn(StaticVariable.askQuestions, SWT.NONE);
+			questionColumn.setText("问题");
+			questionColumn.setWidth(textView.getSize().x);
+		}
+		
 		// 为选项卡添加监听事件
 		tabFolder.addSelectionListener(new TabFordlerListener(tabFolder, StaticVariable.historyCombo));
 		
@@ -430,7 +457,7 @@ public class MainFrame extends ApplicationWindow {
 		}
 
 		public void run() {
-			new CreateClassListener(parent);
+			new CreateClassListener(StaticVariable.parent);
 			createClass();
 		}
 	}
@@ -454,7 +481,7 @@ public class MainFrame extends ApplicationWindow {
 		}
 
 		public void run() {
-			new CreateClassListener(parent);
+			new CreateClassListener(StaticVariable.parent);
 			createClass();
 		}
 	}

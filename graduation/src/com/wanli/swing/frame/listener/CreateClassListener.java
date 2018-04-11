@@ -63,10 +63,11 @@ import com.wanli.utils.StaticVariable;
  */
 public class CreateClassListener extends SelectionAdapter {
 
-	private Composite parent;
+	private Composite parent;	// 存储一切与主窗口相关的信息
 	
 	public CreateClassListener(Composite parent) {
 		this.parent = parent;
+		// 执行窗口弹出
 		new CreateClassShell(parent.getShell()).open();
 	}
 	
@@ -96,15 +97,23 @@ class CreateClassShell extends Dialog {
 	}
 	
 	protected void createContents() {
+		// 创建一个窗口
 		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-        shell.setText("Category Axis");
+        shell.setText("创建教室");
         shell.setSize(300, 150);
+        // 使窗口居中显示
         center(shell.getDisplay(), shell);
+        // 定义一个网格布局
         GridLayout gridLayout = new GridLayout(2, false);
+        // 该布局中组件距离上边框的边距为20
         gridLayout.marginHeight = 20;
+        // 该布局中组件之间的垂直间隔为20
         gridLayout.verticalSpacing = 20;
+        // 该布局中组件距离左边框的边距为40
         gridLayout.marginLeft = 40;
+        // 该布局中组件距离右边框的边距为40
         gridLayout.marginRight = 40;
+        // 设置窗口布局
         shell.setLayout(gridLayout);
         createClass(shell);
 	}
@@ -146,6 +155,7 @@ class CreateClassShell extends Dialog {
 			
 			@Override
 			public void keyPressed(KeyEvent keyEvent) {
+				// 按回车即可触发确认按钮事件
 				if (keyEvent.keyCode == SWT.CR) {
 					shell.setDefaultButton(confirm);
 				}
