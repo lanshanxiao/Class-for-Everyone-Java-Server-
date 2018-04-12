@@ -901,6 +901,7 @@ public class MainFrame extends ApplicationWindow {
 			shell.setText(APPNAME + "-" + file);
 			StaticVariable.tableName = fileName.substring(0, fileName.indexOf("."));
 			dbService.createTable(num, StaticVariable.tableName);
+			
 			//有文件，启用按钮
 			first.setEnabled(true);
 			previous.setEnabled(true);

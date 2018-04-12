@@ -46,4 +46,13 @@ public class DBService {
 	public List<String> getTableList() {
 		return dbDao.getTableList();
 	}
+	
+	/**
+	 * 向表中添加记录
+	 * @param userName：用户名
+	 * @param tableName：表名
+	 */
+	public void addRecord(String userName, String tableName, String[] answers) {
+		dbDao.addRecord(userName, tableName, answers);
+	}
 }

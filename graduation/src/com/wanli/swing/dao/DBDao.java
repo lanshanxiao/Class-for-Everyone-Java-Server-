@@ -117,12 +117,46 @@ public class DBDao {
 		return tables;
 	}
 	
+	/**
+	 * 向表中添加记录
+	 * @param userName：用户名
+	 * @param tableName：表名
+	 */
+	public void addRecord(String userName, String tableName, String[] answers) {
+		PreparedStatement preparedStatement = null;
+		Connection connection = null;
+		int tableColumn = getTableColumn(tableName);
+		String sql = "insert into " + tableName + " values(";
+		for (int i = 0; i < tableColumn; i++) {
+			if (i == tableColumn - 1) {
+				sql += "?)";				
+			} else {
+				sql += "?, ";				
+			}
+		}
+		connection = DbUtilsScoreTab.getConnection();
+		try {
+			preparedStatement = connection.prepareStatement(sql);
+			for (int i = 0; i < tableColumn; i++) {
+				if (i == 0) {
+					preparedStatement.setString(i + 1, userName);
+				} else {
+					preparedStatement.setString(i + 1, answers[i - 1]);
+				}
+			}
+			preparedStatement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) {
 		DBDao dao = new DBDao();
-		List<String> tables = dao.getTableList();
-		for (String table: tables) {
-			System.out.println(table);
-		}
+//		dao.addRecord("11", "ttt");
+//		List<String> tables = dao.getTableList();
+//		for (String table: tables) {
+//			System.out.println(table);
+//		}
 //		dao.createTable(4, "table1");
 //		List<String[]> list = dao.getScoreData("table1");
 //		for (String[] record: list) {

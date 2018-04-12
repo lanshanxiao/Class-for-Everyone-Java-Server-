@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.wanli.swing.dao.DBDaoUser;
 import com.wanli.swing.dao.RegistDao;
 import com.wanli.swing.entities.UserBean;
 import com.wanli.swing.frame.listener.ComboListener;
@@ -228,7 +229,7 @@ public class Login {
 				// 获取登录的用户名和密码
 				window.getUser().setName(comboUser.getText());
 				window.getUser().setPassword(textPassword.getText());
-				RegistDao dao = new RegistDao();
+				DBDaoUser dao = new DBDaoUser();
 				// 查找数据库确认该用户是否存在，存在则执行保存帐号操作和打开主界面
 				if (dao.getUserByNameAndPassword(window.getUser().getName(), window.getUser().getPassword())) {
 					// 清空保存上一次登录信息的文件，保存这次的登录信息

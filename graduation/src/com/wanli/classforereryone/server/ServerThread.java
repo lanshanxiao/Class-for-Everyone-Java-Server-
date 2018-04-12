@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.Array;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -16,6 +18,8 @@ import org.eclipse.swt.widgets.TableItem;
 import com.wanli.swing.Mmmm;
 import com.wanli.swing.entities.OnlineUser;
 import com.wanli.swing.frame.MessagePOP_UP;
+import com.wanli.swing.service.DBService;
+import com.wanli.swing.service.DBServiceUser;
 import com.wanli.utils.StaticVariable;
 
 public class ServerThread implements Runnable {
@@ -28,18 +32,28 @@ public class ServerThread implements Runnable {
 	private static String ipAddress = "";
 	// 存储学生提出的问题
 	private String question;
-	private 
+	// 操作用户数据库
+	private DBServiceUser dbServiceUser;
+	// 操作成绩表数据库
+	private DBService dbService;
+	// 接收学生的答案
+	private String[] answers;
 	
 	public ServerThread(Socket s) throws IOException {
 		this.s = s;
 		// 初始化该Socket对应的输入流
 		br = new BufferedReader(new InputStreamReader(s.getInputStream(), "utf-8"));
+		dbServiceUser = new DBServiceUser();
+		dbService = new DBService();
+		
 	}
 	
 	@Override
 	public void run() {
 		
 		String content = null;
+		int index = 0;
+		ipAddress = s.getInetAddress().toString().substring(1);
 		// 采用循环不断从Socket中读取客户端发送过来的数据
 		while ((content = readFromClient()) != null) {
 			
@@ -47,29 +61,50 @@ public class ServerThread implements Runnable {
 			switch(info[0]) {
 				// 读取注册信息
 				case "1":
-					
+					if (dbServiceUser.addUser(info)) {
+						sendToClient("1");
+					}
 					break;
 				// 读取登录信息
 				case "2":
+					if (dbServiceUser.getUserByNameAndPassword(info[1], info[2])) {
+						sendToClient("2");
+					}
+					StaticVariable.users.get(ipAddress).setInetAddress(s.getInetAddress().toString().substring(1));
+					StaticVariable.users.get(ipAddress).setUsername(info[1]);
 					break;
 				// 读取回答问题的信息
 				case "3":
+					if (StaticVariable.questions != null) {
+						if (answers == null) {
+							answers = new String[StaticVariable.questions.length - 1];
+							answers[index] = info[2];
+							index++;						
+						} else {
+							if (index < answers.length) {
+								System.out.println(info[2]);
+								answers[index] = info[2];
+								if (index == answers.length - 1) {
+									System.out.println(Arrays.toString(answers));
+									dbService.addRecord(info[1], StaticVariable.tableName, answers);
+								}
+								index++;
+							} else {
+								index = 0;
+							}							
+						}
+					}
+//					System.out.println(info[2]);
 					break;
-				// 读取提问的信息
+				// 读取提问的信息，并且弹框提示有学生提问
 				case "4":
+					question = info[1] + ":::" + info[2]; 
+					new Thread(new ListenningMessage(question)).start();
+					StaticVariable.users.get(ipAddress).setContent(info[2]);
+					System.out.println(info[0] + "," + info[1] + "," + info[2]);				
 					break;
 			}
-			StaticVariable.users.get(s.getInetAddress().toString().substring(1)).setInetAddress(s.getInetAddress().toString().substring(1));
-			StaticVariable.users.get(s.getInetAddress().toString().substring(1)).setUsername(info[0]);
-			StaticVariable.users.get(s.getInetAddress().toString().substring(1)).setImei(info[1]);
-			ipAddress = s.getInetAddress().toString().substring(1);
-			// 若发送的消息是客户端发送的提问信息，则弹出提示框
-			if (info.length == 3) {
-				question = info[0] + ":::" + info[2];				
-				new Thread(new ListenningMessage(question)).start();
-				StaticVariable.users.get(s.getInetAddress().toString().substring(1)).setContent(info[2]);
-				System.out.println(info[0] + "," + info[1] + "," + info[2]);				
-			}
+			
 		}
 		// 跳出循环，表明该Socket对应的客户端已经关闭
 		// 删除该Socket
@@ -126,7 +161,6 @@ class ListenningMessage implements Runnable {
 	public void run() {
 		Display.getDefault().syncExec(new Runnable(){
 			public void run() {
-				StaticVariable.askQuestion.setText(StaticVariable.unanswerNum + " 提问");
 				// 在表格中添加一项
 				TableItem item = new TableItem(StaticVariable.askQuestions, SWT.NONE);
 				item.setImage(new Image(StaticVariable.parent.getDisplay(), "image/unanswer.png"));
