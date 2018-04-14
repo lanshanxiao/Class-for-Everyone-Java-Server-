@@ -13,9 +13,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.wanli.swing.entities.ChoiceQuestion;
+import com.wanli.swing.entities.FillInTheBlanks;
 import com.wanli.swing.entities.OnlineUser;
+import com.wanli.swing.entities.TrueOrFalse;
 
 public class StaticVariable {
 	
@@ -42,4 +46,14 @@ public class StaticVariable {
 	public static Map<String, TreeItem> onlineUsers = new HashMap<>();	// 显示所有在线人数的Tree
 	public static TabItem askQuestion;									// 提问选项卡
 	public static Map<TableItem, Boolean> unanswerMap = new HashMap<>();// 存储学生提问中为回答的问题 
+	public static Composite questionCom;								// 课前备题窗口弹出面板
+	public static String questionType;									// 题目类型
+	public static Button nextOption;									// 下一题
+	public static List<ChoiceQuestion> choiceList = new ArrayList<>();	// 存储选择题
+	public static List<TrueOrFalse> trueOrFalseList = new ArrayList<>();// 存储是非题
+	public static List<FillInTheBlanks> fillblanksList = new ArrayList<>();// 存储填空题
+	public static Map<String, Text> choiceAllText = new HashMap<>();	// 存储选择题面板上的所有Text组件
+	public static Map<String, Text> trueOrFalseAllText = new HashMap<>();// 存储是非题面板上的所有Text组件
+	public static Map<String, Text> fillblanksAllText = new HashMap<>();// 存储填空题面板上的所有Text组件
+	public static int creQuesIndex = 0;									// 存储创建题目时的下标，标记创建了多少题目
 }

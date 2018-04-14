@@ -24,8 +24,6 @@ public class HistoryComboListener implements SelectionListener {
 	
 	@Override
 	public void widgetDefaultSelected(SelectionEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

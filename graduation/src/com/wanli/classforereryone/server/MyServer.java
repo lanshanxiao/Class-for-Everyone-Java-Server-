@@ -39,13 +39,12 @@ public class MyServer implements Runnable {
 				e.printStackTrace();
 			}
 			if (s != null) {
-				System.out.println("客户端连接成功！！！");
-				try {
-					// 有客户端连接就把连接的客户端使用map存储
-					StaticVariable.users.put(s.getInetAddress().toString().substring(1), new OnlineUser(s));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+//				System.out.println("客户端连接成功！！！");
+//				try {
+//					
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
 			}
 			//每当客户端连接后启动一条ServerThread线程为该客户端服务
 			try {

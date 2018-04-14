@@ -20,10 +20,12 @@ import com.wanli.swing.frame.listener.AskQuestionTableListener;
 import com.wanli.utils.StaticVariable;
 
 public class MessageShell extends Dialog {
+	// 设置窗口默认大小
 	private static int SHELL_WIDTH = 400;
 	private static int SHELL_HEIGHT = 400;
 	protected Object result;
 	protected Shell shell;
+	// 要显示的问题
 	private String question;
 	public MessageShell(Shell shell, String question) {
 		super(shell);
@@ -51,14 +53,14 @@ public class MessageShell extends Dialog {
         center(shell.getDisplay(), shell);
         // 定义一个网格布局
         GridLayout gridLayout = new GridLayout(2, false);
-        // 该布局中组件距离上边框的边距为20
-        gridLayout.marginHeight = 20;
-        // 该布局中组件之间的垂直间隔为20
-        gridLayout.verticalSpacing = 20;
-        // 该布局中组件距离左边框的边距为40
-        gridLayout.marginLeft = 40;
-        // 该布局中组件距离右边框的边距为40
-        gridLayout.marginRight = 40;
+//        // 该布局中组件距离上边框的边距为20
+//        gridLayout.marginHeight = 20;
+//        // 该布局中组件之间的垂直间隔为20
+//        gridLayout.verticalSpacing = 20;
+//        // 该布局中组件距离左边框的边距为40
+//        gridLayout.marginLeft = 40;
+//        // 该布局中组件距离右边框的边距为40
+//        gridLayout.marginRight = 40;
         // 设置窗口布局
         shell.setLayout(gridLayout);
         createClass(shell);
@@ -66,8 +68,10 @@ public class MessageShell extends Dialog {
 	
 	protected void createClass(Composite parent) {
 		StyledText text = new StyledText(parent, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.WRAP);
-		text.setFont(new Font(parent.getDisplay(), "Arial", 20, SWT.NONE));
-		text.setText(question);
+		text.setFont(new Font(parent.getDisplay(), "Arial", 18, SWT.NONE));
+		String userName = question.substring(0, question.lastIndexOf(":") + 1);
+		String theQuestion = question.substring(question.lastIndexOf(":") + 1);
+		text.setText(userName + "\n" + theQuestion);
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 2;
 		text.setLayoutData(gridData);

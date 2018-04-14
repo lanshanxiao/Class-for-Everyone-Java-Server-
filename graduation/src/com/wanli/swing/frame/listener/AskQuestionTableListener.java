@@ -5,6 +5,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -67,6 +68,22 @@ public class AskQuestionTableListener extends MouseAdapter {
 	        			}
 		        		selected.dispose();
 	        		}
+	        	}
+			});
+			MenuItem readItem = new MenuItem(menu, SWT.PUSH);
+			readItem.setText("标记为已读");
+			readItem.addSelectionListener(new SelectionAdapter() {
+				@Override
+	        	public void widgetSelected(SelectionEvent e) {
+//					int index = AskQuestionTableListener.index;
+					StaticVariable.unanswerMap.remove(StaticVariable.askQuestions.getItem(index));
+        			if (StaticVariable.unanswerMap.size() <= 0) {
+        				StaticVariable.askQuestion.setText("提问");
+        			} else {
+        				StaticVariable.askQuestion.setText(StaticVariable.unanswerMap.size() + " 提问");	        				
+        			}
+        			TableItem item = StaticVariable.askQuestions.getItem(index);
+    				item.setImage(new Image(StaticVariable.parent.getDisplay(), "image/answered.png"));
 	        	}
 			});
 			StaticVariable.askQuestions.setMenu(menu);

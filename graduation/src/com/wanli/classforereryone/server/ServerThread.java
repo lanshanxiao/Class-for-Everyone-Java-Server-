@@ -25,7 +25,7 @@ import com.wanli.utils.StaticVariable;
 public class ServerThread implements Runnable {
 
 	// 定义当前线程所处理的Socket
-	Socket s = null;
+	private Socket s = null;
 	// 该线程所处理的Socket所对应的输入流
 	BufferedReader br = null;
 	// 接收连接上服务端的客户端IP地址
@@ -58,20 +58,34 @@ public class ServerThread implements Runnable {
 		while ((content = readFromClient()) != null) {
 			
 			String[] info = content.split(",");
+//			System.out.println(Arrays.toString(info));
 			switch(info[0]) {
 				// 读取注册信息
 				case "1":
 					if (dbServiceUser.addUser(info)) {
 						sendToClient("1");
+					} else {
+						sendToClient("1-false");
 					}
 					break;
 				// 读取登录信息
 				case "2":
 					if (dbServiceUser.getUserByNameAndPassword(info[1], info[2])) {
+						// 有客户端连接就把连接的客户端使用map存储
+						try {
+							System.out.println("客户端连接成功！！！");
+							StaticVariable.users.put(s.getInetAddress().toString().substring(1), new OnlineUser(s));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						sendToClient("2");
+						System.out.println("登录了。。。。。");
+						StaticVariable.users.get(ipAddress).setInetAddress(s.getInetAddress().toString().substring(1));
+						StaticVariable.users.get(ipAddress).setUsername(info[1]);
+					} else {
+						sendToClient("2-false");
 					}
-					StaticVariable.users.get(ipAddress).setInetAddress(s.getInetAddress().toString().substring(1));
-					StaticVariable.users.get(ipAddress).setUsername(info[1]);
 					break;
 				// 读取回答问题的信息
 				case "3":
@@ -117,24 +131,46 @@ public class ServerThread implements Runnable {
 		try {
 			return br.readLine();
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			System.out.println("客户端退出了。。。");
 		}
 		return null;
 	}
 	
-	// 向客户端发送消息
-	public static void sendToClient(String msg) {
+	/**
+	 * 向所有客户端发送消息
+	 * @param msg
+	 */
+	public static void sendToAllClient(String msg) {
 		// 遍历所有的已连接的客户端，将消息发送给所有的客户端
 		for (Map.Entry<String, OnlineUser> user: StaticVariable.users.entrySet()) {
 			try {
 				System.out.println(msg);
-				OnlineUser val = user.getValue(); 
+				OnlineUser val = user.getValue();
                 PrintWriter pw =val.getPw();  
                 pw.println(msg);  
                 pw.flush();  
             } catch (Exception e) {  
                 e.printStackTrace();  
             }
+		}
+	}
+	
+	/**
+	 * 向客户端发送消息
+	 * @param msg
+	 */
+	public void sendToClient(String msg) {
+		System.out.println(msg);
+        PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(s.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		};
+		if (pw != null) {
+			pw.println(msg);  
+			pw.flush();			
 		}
 	}
 	

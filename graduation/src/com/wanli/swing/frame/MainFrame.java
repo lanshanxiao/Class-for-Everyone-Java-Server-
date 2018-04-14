@@ -1,5 +1,7 @@
 package com.wanli.swing.frame;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,6 +10,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
@@ -135,6 +143,19 @@ public class MainFrame extends ApplicationWindow {
 		open();
 		Display.getCurrent().dispose();
 	}
+	
+	/**
+	 * 使对话框居中显示
+	 * @param display
+	 * @param shell
+	 */
+	protected void center(Display display, Shell shell) {
+		Rectangle bounds = display.getPrimaryMonitor().getBounds();
+		Rectangle rect = shell.getBounds();
+		int x = bounds.x + (bounds.width - rect.width) / 2;
+		int y = bounds.y + (bounds.height - rect.height) / 2;
+		shell.setLocation(x, y);
+	}
 
 	@Override
 	public Control createContents(Composite parent) {
@@ -142,7 +163,8 @@ public class MainFrame extends ApplicationWindow {
 		Rectangle bounds = parent.getShell().getDisplay().getPrimaryMonitor().getBounds();
 		int windowWidth = bounds.width;
 		int windowHeight = (int) (bounds.height * 0.98);
-		parent.getShell().setSize(windowWidth, (int) (bounds.height * 0.98));
+		parent.getShell().getDisplay();
+		center(parent.getDisplay(), parent.getShell());
 		// 设置窗体标题
 		parent.getShell().setText(APPNAME);
 		shell = parent.getShell();
@@ -166,7 +188,7 @@ public class MainFrame extends ApplicationWindow {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				ServerThread.sendToClient("开启霸屏");
+				ServerThread.sendToAllClient("开启霸屏");
 			}
 		});
 		Button screenshot = new Button(createRoom, SWT.NONE);
@@ -446,6 +468,7 @@ public class MainFrame extends ApplicationWindow {
 		ToolBarManager toolBarManager = new ToolBarManager(style);
 		// gtoolBarManager.add(new NewCreateAction());
 		toolBarManager.add(new OpenFileAction());
+		toolBarManager.add(new CreateXmlFile());
 		toolBarManager.add(new NewCreateAction());
 		// toolBarManager.add(new SaveFileAction());
 		// toolBarManager.add(new Separator());
@@ -540,6 +563,29 @@ public class MainFrame extends ApplicationWindow {
 			// 在打开新的文件之前，判断是否保存当前文件
 			if (judgeTextSave())
 				OpenTextFile();
+		}
+	}
+	
+	/**
+	 * 课前备题，工具栏
+	 * @author wanli
+	 *
+	 */
+	class CreateXmlFile extends Action {
+		public CreateXmlFile() {
+			super("OpenFileAction@Ctrl+Shift+C", Action.AS_PUSH_BUTTON);
+			setText("备题");
+			try {
+				// 载入图像
+				ImageDescriptor icon = ImageDescriptor.createFromURL(new URL("file:image/before_class.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				System.err.println(e.getMessage());
+			}
+		}
+		
+		public void run() {
+			new PrepareLessons(StaticVariable.parent);
 		}
 	}
 
