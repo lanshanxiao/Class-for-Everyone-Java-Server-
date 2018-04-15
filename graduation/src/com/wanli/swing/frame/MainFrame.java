@@ -1,7 +1,5 @@
 package com.wanli.swing.frame;
 
-import java.awt.Component;
-import java.awt.Container;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,12 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
@@ -33,12 +25,9 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -79,6 +68,11 @@ import com.wanli.swing.service.DBService;
 import com.wanli.thread.ListeningSocket;
 import com.wanli.utils.StaticVariable;
 
+/**
+ * 软件主窗口
+ * @author wanli
+ *
+ */
 public class MainFrame extends ApplicationWindow {
 	private static String APPNAME = "Class For Everyone";	// 当前软件的名称
 	private static String welcome = "欢迎您，";				// 显示欢迎提示

@@ -14,6 +14,11 @@ import java.util.Map;
 import com.wanli.swing.entities.OnlineUser;
 import com.wanli.utils.StaticVariable;
 
+/**
+ * 监听是否有客户端连接
+ * @author wanli
+ *
+ */
 public class MyServer implements Runnable {
 
 	//定义保存所有Socket的Map

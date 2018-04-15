@@ -22,6 +22,11 @@ import com.wanli.swing.service.DBService;
 import com.wanli.swing.service.DBServiceUser;
 import com.wanli.utils.StaticVariable;
 
+/**
+ * 每个客户的专属线程，可以接收客户端发送的消息，也可以向客户端发送消息
+ * @author wanli
+ *
+ */
 public class ServerThread implements Runnable {
 
 	// 定义当前线程所处理的Socket

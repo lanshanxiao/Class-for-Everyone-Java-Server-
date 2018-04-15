@@ -1,6 +1,7 @@
 package com.wanli.swing.frame.listener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,9 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 
 import com.wanli.swing.entities.ChoiceQuestion;
+import com.wanli.swing.entities.FillInTheBlanks;
+import com.wanli.swing.entities.TrueOrFalse;
+import com.wanli.utils.AddToQuestionList;
 import com.wanli.utils.StaticVariable;
 
 public class NextOptionListener extends SelectionAdapter {
@@ -20,44 +24,23 @@ public class NextOptionListener extends SelectionAdapter {
 	
 	@Override
 	public void widgetSelected(SelectionEvent e) {
+		// 先清空optionKeys，否则会影响下一个选择题的选项
 		optionKeys.clear();
+		// 判断是否所有输入框都有填写，默认为false
 		boolean hasEmpty = false;
 		switch (StaticVariable.questionType) {
+		// 选择题
 		case "choice":
-			for (Map.Entry<String, Text> inputText: StaticVariable.choiceAllText.entrySet()) {
-				if (inputText.getValue().getText() == null || inputText.getValue().getText() == "") {
-					MessageBox messageBox = new MessageBox(StaticVariable.parent.getShell(), SWT.YES);
-					messageBox.setText("警告");
-					messageBox.setMessage("所有空行都不能为空！！！");
-					messageBox.open();
-					hasEmpty = true;
-					break;
-				}
-			}
-			if (!hasEmpty) {
-				StaticVariable.creQuesIndex++;
-				String question = StaticVariable.choiceAllText.get("question").getText();
-				String answer = StaticVariable.choiceAllText.get("answer").getText();
-				List<String> options = new ArrayList<>();
-				for (String key: StaticVariable.choiceAllText.keySet()) {
-					if (!key.equals("answer") && !key.equals("question")) {
-						optionKeys.add(key);						
-					}
-				}
-				Collections.sort(optionKeys);
-				for (String key: optionKeys) {
-					options.add(StaticVariable.choiceAllText.get(key).getText());
-				}
-				StaticVariable.choiceList.add(new ChoiceQuestion(Integer.toString(StaticVariable.creQuesIndex), question, answer, options));
-				
-			}
+			AddToQuestionList.addToChoiceList(optionKeys, hasEmpty);
 			break;
-			
+		
+		// 是非题
 		case "true_or_false":
-			
+			AddToQuestionList.addToTrueOrFalseList(hasEmpty);
 			break;
 			
 		case "fill_in_the_blanks":
+			AddToQuestionList.addToFillBlanks(hasEmpty);
 			break;
 			
 		}

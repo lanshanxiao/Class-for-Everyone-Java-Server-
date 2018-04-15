@@ -12,6 +12,16 @@ public class TrueOrFalse {
 	private String type = "true_or_false"; 		// 类型：填空题
 	private String answer;						// 答案
 	
+	public TrueOrFalse(String no, String question, String answer) {
+		super();
+		this.no = no;
+		this.question = question;
+		this.answer = answer;
+	}
+	
+	public TrueOrFalse() {
+	}
+	
 	@XmlAttribute(name = "no")
 	public String getNo() {
 		return no;
@@ -42,6 +52,11 @@ public class TrueOrFalse {
 	}
 	public void setAnswer(String answer) {
 		this.answer = answer;
+	}
+
+	@Override
+	public String toString() {
+		return "TrueOrFalse [no=" + no + ", question=" + question + ", type=" + type + ", answer=" + answer + "]";
 	}
 	
 	

@@ -19,6 +19,11 @@ import com.wanli.utils.MailUtils;
 import com.wanli.utils.Randomutil;
 import com.wanli.utils.SmsUtils;
 
+/**
+ * ×¢²áÕËºÅºÍÕÒ»ØÃÜÂëµÄAction
+ * @author wanli
+ *
+ */
 public class RegistUserAction extends ActionSupport implements RequestAware, ModelDriven<UserBean>, Preparable {
 
 	/**

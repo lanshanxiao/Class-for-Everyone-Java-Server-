@@ -21,6 +21,11 @@ import com.wanli.swing.entities.FillInTheBlanks;
 import com.wanli.swing.entities.OnlineUser;
 import com.wanli.swing.entities.TrueOrFalse;
 
+/**
+ * 存储所有静态属性
+ * @author wanli
+ *
+ */
 public class StaticVariable {
 	
 	public static Composite parent;										// 主窗体的Composite类

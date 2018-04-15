@@ -10,6 +10,11 @@ import java.util.List;
 
 import com.wanli.utils.DbUtilsScoreTab;
 
+/**
+ * 操作数据库的Dao层类
+ * @author wanli
+ *
+ */
 public class DBDao {
 
 	/**

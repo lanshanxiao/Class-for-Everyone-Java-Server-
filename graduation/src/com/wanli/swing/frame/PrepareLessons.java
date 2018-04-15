@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import com.wanli.swing.frame.listener.CreateXmlFileBtnListener;
 import com.wanli.swing.frame.listener.QuestionTypeListener;
 import com.wanli.swing.frame.questiontype.BeginningComposite;
 import com.wanli.utils.StaticVariable;
@@ -95,6 +96,7 @@ class PrepareShell extends Dialog {
 		// 创建Xml文件按钮
 		Button create = new Button(parent, SWT.NONE);
 		create.setText("创    建");
+		create.addSelectionListener(new CreateXmlFileBtnListener());
 
 		// 设置下拉框控件和创建按钮的布局
 		GridData fill = new GridData(GridData.FILL_HORIZONTAL);

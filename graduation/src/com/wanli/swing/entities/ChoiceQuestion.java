@@ -24,6 +24,9 @@ public class ChoiceQuestion {
 		this.options = options;
 	}
 	
+	public ChoiceQuestion() {
+	}
+	
 	@XmlAttribute(name = "no")
 	public String getNo() {			
 		return no;

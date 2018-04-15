@@ -14,6 +14,15 @@ public class FillInTheBlanks {
 	private String type = "fill_in_the_blanks"; // 类型：填空题
 	private List<String> answer;				// 答案
 	
+	public FillInTheBlanks() {
+	}
+	
+	public FillInTheBlanks(String no, String question, List<String> answer) {
+		super();
+		this.no = no;
+		this.question = question;
+		this.answer = answer;
+	}
 	@XmlAttribute(name = "no")
 	public String getNo() {
 		return no;
@@ -44,6 +53,11 @@ public class FillInTheBlanks {
 	}
 	public void setAnswer(List<String> answer) {
 		this.answer = answer;
+	}
+
+	@Override
+	public String toString() {
+		return "FillInTheBlanks [no=" + no + ", question=" + question + ", type=" + type + ", answer=" + answer.toString() + "]";
 	}
 	
 	
