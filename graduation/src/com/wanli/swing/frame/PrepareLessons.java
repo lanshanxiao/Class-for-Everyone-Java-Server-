@@ -1,6 +1,8 @@
 package com.wanli.swing.frame;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -9,6 +11,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 import com.wanli.swing.frame.listener.CreateXmlFileBtnListener;
@@ -66,6 +69,22 @@ class PrepareShell extends Dialog {
 		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
         shell.setText("课前备题");
         shell.setSize(500, 500);
+        
+        shell.addShellListener(new ShellAdapter() {
+        	@Override
+        	public void shellClosed(ShellEvent e) {
+        		
+    			MessageBox messageBox = new MessageBox(shell, SWT.YES | SWT.NO);
+    			messageBox.setText("警告");
+    			messageBox.setMessage("确定要退出吗？");
+    			if (e.doit = messageBox.open() == SWT.YES) {
+    				StaticVariable.choiceList.clear();
+    				StaticVariable.trueOrFalseList.clear();
+    				StaticVariable.fillblanksList.clear();
+    			} 
+    		}
+        	
+		});
         // 使窗口居中显示
         center(shell.getDisplay(), shell);
         // 定义一个网格布局
@@ -96,7 +115,7 @@ class PrepareShell extends Dialog {
 		// 创建Xml文件按钮
 		Button create = new Button(parent, SWT.NONE);
 		create.setText("创    建");
-		create.addSelectionListener(new CreateXmlFileBtnListener());
+		create.addSelectionListener(new CreateXmlFileBtnListener(shell));
 
 		// 设置下拉框控件和创建按钮的布局
 		GridData fill = new GridData(GridData.FILL_HORIZONTAL);

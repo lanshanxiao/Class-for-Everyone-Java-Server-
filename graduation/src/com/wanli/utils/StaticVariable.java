@@ -61,4 +61,5 @@ public class StaticVariable {
 	public static Map<String, Text> trueOrFalseAllText = new HashMap<>();// 存储是非题面板上的所有Text组件
 	public static Map<String, Text> fillblanksAllText = new HashMap<>();// 存储填空题面板上的所有Text组件
 	public static int creQuesIndex = 0;									// 存储创建题目时的下标，标记创建了多少题目
+	public static boolean firstOpenPrepareLessonsShell = true;			// 标记是否是软件启动后第一次打开备课窗口
 }

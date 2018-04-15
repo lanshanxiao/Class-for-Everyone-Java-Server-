@@ -15,6 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
 
 import com.wanli.swing.entities.Question;
 import com.wanli.utils.AddToQuestionList;
@@ -30,6 +31,11 @@ public class CreateXmlFileBtnListener implements SelectionListener {
 	private Question questions;							// Question类，映射成xml文件
 	private String create;								// 标记是否创建xml文件
 	private List<String> optionKeys = new ArrayList<>();// 存储StaticVariable.choiceAllText所有选项的key值
+	private Shell shell;
+	
+	public CreateXmlFileBtnListener(Shell shell) {
+		this.shell = shell;
+	}
 	
 	@Override
 	public void widgetDefaultSelected(SelectionEvent arg0) {
@@ -63,11 +69,14 @@ public class CreateXmlFileBtnListener implements SelectionListener {
 			// 生成映射字符串
 			String str = beanToXml(questions, Question.class);
 			// 写入到xml文件中
-			saveXmlFile(str);
+			boolean save = saveXmlFile(str);
 			StaticVariable.choiceList.clear();
 			StaticVariable.trueOrFalseList.clear();
 			StaticVariable.fillblanksList.clear();
-			StaticVariable.creQuesIndex = 0;			
+			StaticVariable.creQuesIndex = 0;
+			if (save) {
+				shell.dispose();				
+			}
 		}
 	}
 	
@@ -94,7 +103,8 @@ public class CreateXmlFileBtnListener implements SelectionListener {
         return writer.toString();
     }
 
-    private void saveXmlFile(String str) {
+    private boolean saveXmlFile(String str) {
+    	boolean save = false;
     	// 保存文件对话框
     	FileDialog dialog = new FileDialog(StaticVariable.parent.getShell(), SWT.SAVE);
     	dialog.setText("保存");
@@ -103,6 +113,7 @@ public class CreateXmlFileBtnListener implements SelectionListener {
     	// 打开对话框，并返回保存文件的路径
     	String saveFile = dialog.open();
     	if (saveFile != null && saveFile != "") {
+    		save = true;
     		File file = new File(saveFile);
     		try {
     			FileWriter writer = new FileWriter(file);
@@ -114,6 +125,7 @@ public class CreateXmlFileBtnListener implements SelectionListener {
     			e.printStackTrace();
     		}    		
     	}
+    	return save;
     }
     
 }

@@ -52,16 +52,19 @@ public class QuestionTypeListener implements SelectionListener {
 
 		// 选择题
 		case 1:
-			// 当前已经是选择题类型
-			if (StaticVariable.questionType != null && StaticVariable.questionType.equals("choice")) {
-				// 判断当前的题有没有填写内容，有则询问是否放弃本题
-				select = AddToQuestionList.judgeTextValue(StaticVariable.choiceAllText);
-			} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("true_or_false")) {
-				// 切换成是非题，判断当前的题有没有填写内容，有则询问是否放弃本题
-				select = AddToQuestionList.judgeTextValue(StaticVariable.trueOrFalseAllText);
-			} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("fill_in_the_blanks")) {
-				// 切换成填空题，判断当前的题有没有填写内容，有则询问是否放弃本题
-				select = AddToQuestionList.judgeTextValue(StaticVariable.fillblanksAllText);
+			if (!StaticVariable.firstOpenPrepareLessonsShell) {
+				// 当前已经是选择题类型
+				if (StaticVariable.questionType != null && StaticVariable.questionType.equals("choice")) {
+					// 判断当前的题有没有填写内容，有则询问是否放弃本题
+					select = AddToQuestionList.judgeTextValue(StaticVariable.choiceAllText);
+				} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("true_or_false")) {
+					// 切换成是非题，判断当前的题有没有填写内容，有则询问是否放弃本题
+					select = AddToQuestionList.judgeTextValue(StaticVariable.trueOrFalseAllText);
+				} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("fill_in_the_blanks")) {
+					// 切换成填空题，判断当前的题有没有填写内容，有则询问是否放弃本题
+					select = AddToQuestionList.judgeTextValue(StaticVariable.fillblanksAllText);
+				}
+				StaticVariable.firstOpenPrepareLessonsShell = false;
 			}
 			if (select.equals("true")) {
 				// 清空所有的map
@@ -80,16 +83,19 @@ public class QuestionTypeListener implements SelectionListener {
 			
 		// 是非题
 		case 2:
-			// 当前已经是是非题
-			if (StaticVariable.questionType != null && StaticVariable.questionType.equals("true_or_false")) {
-				// 判断当前的题有没有填写内容，有则询问是否放弃本题
-				select = AddToQuestionList.judgeTextValue(StaticVariable.trueOrFalseAllText);
-			} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("choice")) {
-				// 切换成选择题，判断当前的题有没有填写内容，有则询问是否放弃本题
-				select = AddToQuestionList.judgeTextValue(StaticVariable.choiceAllText);
-			} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("fill_in_the_blanks")) {
-				// 切换成填空题，判断当前的题有没有填写内容，有则询问是否放弃本题
-				select = AddToQuestionList.judgeTextValue(StaticVariable.fillblanksAllText);
+			if (!StaticVariable.firstOpenPrepareLessonsShell) {
+				// 当前已经是是非题
+				if (StaticVariable.questionType != null && StaticVariable.questionType.equals("true_or_false")) {
+					// 判断当前的题有没有填写内容，有则询问是否放弃本题
+					select = AddToQuestionList.judgeTextValue(StaticVariable.trueOrFalseAllText);
+				} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("choice")) {
+					// 切换成选择题，判断当前的题有没有填写内容，有则询问是否放弃本题
+					select = AddToQuestionList.judgeTextValue(StaticVariable.choiceAllText);
+				} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("fill_in_the_blanks")) {
+					// 切换成填空题，判断当前的题有没有填写内容，有则询问是否放弃本题
+					select = AddToQuestionList.judgeTextValue(StaticVariable.fillblanksAllText);
+				}
+				StaticVariable.firstOpenPrepareLessonsShell = false;
 			}
 			if (select.equals("true")) {
 				// 清空所有的map
@@ -108,16 +114,19 @@ public class QuestionTypeListener implements SelectionListener {
 			
 		// 填空题
 		case 3:
-			// 当前已经是填空题
-			if (StaticVariable.questionType != null && StaticVariable.questionType.equals("fill_in_the_blanks")) {
-				// 判断当前的题有没有填写内容，有则询问是否放弃本题 
-				select = AddToQuestionList.judgeTextValue(StaticVariable.fillblanksAllText);
-			} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("choice")) {
-				// 切换成选择题，判断当前的题有没有填写内容，有则询问是否放弃本题
-				select = AddToQuestionList.judgeTextValue(StaticVariable.choiceAllText);
-			} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("true_or_false")) {
-				// 切换成是非题，判断当前的题有没有填写内容，有则询问是否放弃本题
-				select = AddToQuestionList.judgeTextValue(StaticVariable.trueOrFalseAllText);
+			if (!StaticVariable.firstOpenPrepareLessonsShell) {
+				// 当前已经是填空题
+				if (StaticVariable.questionType != null && StaticVariable.questionType.equals("fill_in_the_blanks")) {
+					// 判断当前的题有没有填写内容，有则询问是否放弃本题 
+					select = AddToQuestionList.judgeTextValue(StaticVariable.fillblanksAllText);
+				} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("choice")) {
+					// 切换成选择题，判断当前的题有没有填写内容，有则询问是否放弃本题
+					select = AddToQuestionList.judgeTextValue(StaticVariable.choiceAllText);
+				} else if (StaticVariable.questionType != null && StaticVariable.questionType.equals("true_or_false")) {
+					// 切换成是非题，判断当前的题有没有填写内容，有则询问是否放弃本题
+					select = AddToQuestionList.judgeTextValue(StaticVariable.trueOrFalseAllText);
+				}
+				StaticVariable.firstOpenPrepareLessonsShell = false;
 			}
 			if (select.equals("true")) {
 				clearAllMap();

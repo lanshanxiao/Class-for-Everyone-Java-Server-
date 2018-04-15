@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.wanli.utils.DBUtilsUser;
 
@@ -49,7 +51,26 @@ public class DBDaoUser {
 		boolean is_get = false;
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
-		String sql = "select * from userbean where name = ? and password = ?";
+		Pattern pattern = null;
+		Matcher matcher = null;
+		String sql;
+		String regexPhone = "^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}$";
+		String regexEmail = "^([a-zA-Z0-9]+[_|\\_|\\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\\_|\\.]?)*[a-zA-Z0-9]+\\.[a-zA-Z]{2,3}$";
+		pattern = Pattern.compile(regexPhone);
+		matcher = pattern.matcher(name);
+		if (matcher.matches()) {
+			System.out.println("手机格式正确");
+			sql = "select * from userbean where name = ? and password = ?";
+		} else {
+			pattern = Pattern.compile(regexEmail);
+			matcher = pattern.matcher(name);
+			if (matcher.matches()) {
+				System.out.println("邮箱格式正确");
+				sql = "select * from userbean where email = ? and password = ?";
+			} else {
+				return is_get;
+			}
+		}
 		Connection connection = DBUtilsUser.getConnection();
 		try {
 			statement = connection.prepareStatement(sql);
@@ -92,8 +113,9 @@ public class DBDaoUser {
 	
 	public static void main(String[] args) {
 		DBDaoUser daoUser = new DBDaoUser();
-		String[] user = {"14433333333", "陈文豪3141904210", "123456", "RRT@qq.com"};
-		daoUser.addUser(user);
+//		String[] user = {"14433333333", "陈文豪3141904210", "123456", "RRT@qq.com"};
+//		daoUser.addUser(user);
+		System.out.println(daoUser.getUserByNameAndPassword("124@qq.com", "123456"));;
 	}
 	
 }
