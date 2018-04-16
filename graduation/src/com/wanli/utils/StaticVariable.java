@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -62,4 +64,8 @@ public class StaticVariable {
 	public static Map<String, Text> fillblanksAllText = new HashMap<>();// 存储填空题面板上的所有Text组件
 	public static int creQuesIndex = 0;									// 存储创建题目时的下标，标记创建了多少题目
 	public static boolean firstOpenPrepareLessonsShell = true;			// 标记是否是软件启动后第一次打开备课窗口
+	public static Map<String, String> questionsMap = new HashMap<>();	// 存储所有的问题
+	public static Combo questionSelect;									// 选择问题的下拉框
+	public static StyleRange style, range;								// 风格
+	public static Color color;
 }

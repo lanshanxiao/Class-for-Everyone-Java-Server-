@@ -1,17 +1,11 @@
 package com.wanli.swing.frame;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -25,6 +19,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -45,6 +40,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
@@ -62,11 +59,21 @@ import com.wanli.swing.frame.listener.CreateClassListener;
 import com.wanli.swing.frame.listener.HistoryCharBtnListener;
 import com.wanli.swing.frame.listener.HistoryComboListener;
 import com.wanli.swing.frame.listener.OnlineTreeListener;
+import com.wanli.swing.frame.listener.QuestionSelectComboListener;
 import com.wanli.swing.frame.listener.ScoreChartBtnListener;
 import com.wanli.swing.frame.listener.TabFordlerListener;
+import com.wanli.swing.frame.text.menu.listener.BoldFont;
+import com.wanli.swing.frame.text.menu.listener.CopyText;
+import com.wanli.swing.frame.text.menu.listener.CutText;
+import com.wanli.swing.frame.text.menu.listener.ItalicText;
+import com.wanli.swing.frame.text.menu.listener.PasteText;
+import com.wanli.swing.frame.text.menu.listener.SelectAll;
+import com.wanli.swing.frame.text.menu.listener.SetTextColor;
+import com.wanli.swing.frame.text.menu.listener.UnderlineText;
 import com.wanli.swing.service.DBService;
 import com.wanli.thread.ListeningSocket;
 import com.wanli.utils.StaticVariable;
+import com.wanli.utils.XmlToJavaBean;
 
 /**
  * 软件主窗口
@@ -93,19 +100,17 @@ public class MainFrame extends ApplicationWindow {
 	private Tree tree;										// 显示在线用户列表
 	private Font font;										// 字体
 	private File file;										// 文件
-	private Color color;									// 颜色
-	private StyleRange style, range;						// 风格
 	private TabFolder tabFolder;							// 选项卡
-	private Button first;									// 跳转到第一题
-	private Button previous;								// 上一题
-	private Button next;									// 下一题
-	private Button last;									// 最后一题
+//	private Button first;									// 跳转到第一题
+//	private Button previous;								// 上一题
+//	private Button next;									// 下一题
+//	private Button last;									// 最后一题
 	private String userName;								// 用户名
 	boolean changes;										// 文档是否改变
 	private DBService dbService;							// 创建操作dao的业务
 	private Runtime runtime;								// 获取当前程序的运行时
 	private Process process;								// 用来存储调用的外部进程
-
+	
 	public MainFrame(String userName) {
 		// 部署窗口
 		super(null);
@@ -264,27 +269,71 @@ public class MainFrame extends ApplicationWindow {
 			StaticVariable.text.setLeftMargin(40);
 			StaticVariable.text.setFont(new Font(parent.getDisplay(), "Arial", 20, SWT.NONE));
 			StaticVariable.text.setBounds(0, 0, textComp.getSize().x, questionComp.getSize().y);
+			// 为text添加右键菜单
+			Menu menu = new Menu(shell, SWT.POP_UP);
+			// 添加全选菜单
+			MenuItem selectAllItem = new MenuItem(menu, SWT.PUSH);
+			selectAllItem.setText("全选");
+			selectAllItem.addSelectionListener(new SelectAll());
+			// 添加复制菜单
+			MenuItem copyItem = new MenuItem(menu, SWT.PUSH);
+			copyItem.setText("复制");
+			copyItem.addSelectionListener(new CopyText());
+			// 添加黏贴菜单
+			MenuItem pasteItem = new MenuItem(menu, SWT.PUSH);
+			pasteItem.setText("黏贴");
+			pasteItem.addSelectionListener(new PasteText());
+			// 添加剪切菜单
+			MenuItem cutItem = new MenuItem(menu, SWT.PUSH);
+			cutItem.setText("剪切");
+			cutItem.addSelectionListener(new CutText());
+			// 添加加粗菜单
+			MenuItem boldItem = new MenuItem(menu, SWT.PUSH);
+			boldItem.setText("加粗");
+			boldItem.addSelectionListener(new BoldFont());
+			// 添加斜体菜单
+			MenuItem italicItem = new MenuItem(menu, SWT.PUSH);
+			italicItem.setText("斜体");
+			italicItem.addSelectionListener(new ItalicText());
+			// 添加下划线菜单
+			MenuItem underlineItem = new MenuItem(menu, SWT.PUSH);
+			underlineItem.setText("下划线");
+			underlineItem.addSelectionListener(new UnderlineText());
+			// 添加设置颜色菜单
+			MenuItem colorItem = new MenuItem(menu, SWT.PUSH);
+			colorItem.setText("设置颜色");
+			colorItem.addSelectionListener(new SetTextColor());
+			StaticVariable.text.setMenu(menu);
 			//为socreTableComp面板设置一个控制布局的对象GridTab1，设置该面板在水平、垂直两个方向全充满
 			GridData gridTab1 = new GridData(GridData.FILL_BOTH);
 			//设置socreTableComp面板垂直占4列
 			gridTab1.horizontalSpan = 4;
 			textComp.setLayoutData(gridTab1);
-			// 定义操作按钮
-			first = new Button(questionComp, SWT.NONE);
-			first.setText("首题");
-			first.setEnabled(false);
-
-			previous = new Button(questionComp, SWT.NONE);
-			previous.setText("上一题");
-			previous.setEnabled(false);
-
-			next = new Button(questionComp, SWT.NONE);
-			next.setText("下一题");
-			next.setEnabled(false);
-
-			last = new Button(questionComp, SWT.NONE);
-			last.setText("末题");
-			last.setEnabled(false);
+			// 定义一个Label控件
+			Label choiceQues = new Label(questionComp, SWT.NONE);
+			choiceQues.setText("选择题目：");
+			// 定义一个下拉框，用于选择题目
+			StaticVariable.questionSelect = new Combo(questionComp, SWT.READ_ONLY);
+			StaticVariable.questionSelect.add("请选择题目");
+			StaticVariable.questionSelect.select(0);
+			GridData selectGrid = new GridData(GridData.FILL_HORIZONTAL);
+			StaticVariable.questionSelect.setLayoutData(selectGrid);
+			StaticVariable.questionSelect.addSelectionListener(new QuestionSelectComboListener());
+//			first = new Button(questionComp, SWT.NONE);
+//			first.setText("首题");
+//			first.setEnabled(false);
+//
+//			previous = new Button(questionComp, SWT.NONE);
+//			previous.setText("上一题");
+//			previous.setEnabled(false);
+//
+//			next = new Button(questionComp, SWT.NONE);
+//			next.setText("下一题");
+//			next.setEnabled(false);
+//
+//			last = new Button(questionComp, SWT.NONE);
+//			last.setText("末题");
+//			last.setEnabled(false);
 		}
 
 		// 定义第二个选项卡
@@ -392,10 +441,10 @@ public class MainFrame extends ApplicationWindow {
 		statusBar.setBounds(0, (int) (windowHeight * 0.87), windowWidth, 33);
 
 		// 给所有按钮添加监听器
-		first.addSelectionListener(new ButtonDownListener("first"));
-		previous.addSelectionListener(new ButtonDownListener("previous"));
-		next.addSelectionListener(new ButtonDownListener("next"));
-		last.addSelectionListener(new ButtonDownListener("last"));
+//		first.addSelectionListener(new ButtonDownListener("first"));
+//		previous.addSelectionListener(new ButtonDownListener("previous"));
+//		next.addSelectionListener(new ButtonDownListener("next"));
+//		last.addSelectionListener(new ButtonDownListener("last"));
 		StaticVariable.refresh.addSelectionListener(new ButtonDownListener("refresh"));
 		StaticVariable.scoreChartBtn.addSelectionListener(new ScoreChartBtnListener(parent));
 		StaticVariable.historyCharBtn.addSelectionListener(new HistoryCharBtnListener(parent));
@@ -691,13 +740,13 @@ public class MainFrame extends ApplicationWindow {
 			FontDialog fontDialog = new FontDialog(getShell());
 			fontDialog.setFontList((StaticVariable.text.getFont()).getFontData());
 			FontData fontData = fontDialog.open();
-			if (fontData != null) {
-				if (font != null) {
-					font.dispose();
-				}
-				font = new Font(getShell().getDisplay(), fontData);
-				StaticVariable.text.setFont(font);
-			}
+//			if (fontData != null) {
+//				if (font != null) {
+//					font.dispose();
+//				}
+//			}
+			font = new Font(getShell().getDisplay(), fontData);
+			StaticVariable.text.setFont(font);
 		}
 	}
 
@@ -718,27 +767,27 @@ public class MainFrame extends ApplicationWindow {
 			RGB rgb = dlg.open();
 			if (rgb != null) {
 				// 定义 color 对象
-				color = new Color(getShell().getDisplay(), rgb);
+				StaticVariable.color = new Color(getShell().getDisplay(), rgb);
 				// 定义 point 对象，获取选择范围。
 				Point point = StaticVariable.text.getSelectionRange();
 				for (int i = point.x; i < point.x + point.y; i++) {
 					// 获得选中的字体样式和范围
-					range = StaticVariable.text.getStyleRangeAtOffset(i);
+					StaticVariable.range = StaticVariable.text.getStyleRangeAtOffset(i);
 					// 如果字体设置了其他样式( 如加粗、斜体、加下划线)
-					if (range != null) {
+					if (StaticVariable.range != null) {
 						/**
 						 * 设置一个与原来 StyleRange 的值相同的 StyleRange
 						 */
-						style = (StyleRange) range.clone();
-						style.start = i;
-						style.length = 1;
+						StaticVariable.style = (StyleRange) StaticVariable.range.clone();
+						StaticVariable.style.start = i;
+						StaticVariable.style.length = 1;
 						// 设置前景颜色
-						style.foreground = color;
+						StaticVariable.style.foreground = StaticVariable.color;
 					} else {
 
-						style = new StyleRange(i, 1, color, null, SWT.NORMAL);
+						StaticVariable.style = new StyleRange(i, 1, StaticVariable.color, null, SWT.NORMAL);
 					}
-					StaticVariable.text.setStyleRange(style);
+					StaticVariable.text.setStyleRange(StaticVariable.style);
 				}
 			}
 		}
@@ -791,6 +840,11 @@ public class MainFrame extends ApplicationWindow {
 		}
 	}
 
+	/**
+	 * 加粗
+	 * @author wanli
+	 *
+	 */
 	class BlodAction extends Action {
 		public BlodAction() {
 			setText(" 加粗");
@@ -801,19 +855,24 @@ public class MainFrame extends ApplicationWindow {
 			for (int i = point.x; i < point.x + point.y; i++) {
 				StyleRange range = StaticVariable.text.getStyleRangeAtOffset(i);
 				if (range != null) {
-					style = (StyleRange) range.clone();
-					style.start = i;
-					style.length = 1;
+					StaticVariable.style = (StyleRange) range.clone();
+					StaticVariable.style.start = i;
+					StaticVariable.style.length = 1;
 				} else {
-					style = new StyleRange(i, 1, null, null, SWT.NORMAL);
+					StaticVariable.style = new StyleRange(i, 1, null, null, SWT.NORMAL);
 				}
 				// 加粗字体
-				style.fontStyle ^= SWT.BOLD;
-				StaticVariable.text.setStyleRange(style);
+				StaticVariable.style.fontStyle ^= SWT.BOLD;
+				StaticVariable.text.setStyleRange(StaticVariable.style);
 			}
 		}
 	}
 
+	/**
+	 * 斜体
+	 * @author wanli
+	 *
+	 */
 	class ItalicAction extends Action {
 		public ItalicAction() {
 			setText(" 斜体");
@@ -822,21 +881,26 @@ public class MainFrame extends ApplicationWindow {
 		public void run() {
 			Point point = StaticVariable.text.getSelectionRange();
 			for (int i = point.x; i < point.x + point.y; i++) {
-				range = StaticVariable.text.getStyleRangeAtOffset(i);
-				if (range != null) {
-					style = (StyleRange) range.clone();
-					style.start = i;
-					style.length = 1;
+				StaticVariable.range = StaticVariable.text.getStyleRangeAtOffset(i);
+				if (StaticVariable.range != null) {
+					StaticVariable.style = (StyleRange) StaticVariable.range.clone();
+					StaticVariable.style.start = i;
+					StaticVariable.style.length = 1;
 				} else {
-					style = new StyleRange(i, 1, null, null, SWT.NORMAL);
+					StaticVariable.style = new StyleRange(i, 1, null, null, SWT.NORMAL);
 				}
 				// 设置为斜体
-				style.fontStyle ^= SWT.ITALIC;
-				StaticVariable.text.setStyleRange(style);
+				StaticVariable.style.fontStyle ^= SWT.ITALIC;
+				StaticVariable.text.setStyleRange(StaticVariable.style);
 			}
 		}
 	}
 
+	/**
+	 * 下划线
+	 * @author wanli
+	 *
+	 */
 	class UnderlineAction extends Action {
 		public UnderlineAction() {
 			setText(" 下划线");
@@ -845,17 +909,17 @@ public class MainFrame extends ApplicationWindow {
 		public void run() {
 			Point point = StaticVariable.text.getSelectionRange();
 			for (int i = point.x; i < point.x + point.y; i++) {
-				range = StaticVariable.text.getStyleRangeAtOffset(i);
-				if (range != null) {
-					style = (StyleRange) range.clone();
-					style.start = i;
-					style.length = 1;
+				StaticVariable.range = StaticVariable.text.getStyleRangeAtOffset(i);
+				if (StaticVariable.range != null) {
+					StaticVariable.style = (StyleRange) StaticVariable.range.clone();
+					StaticVariable.style.start = i;
+					StaticVariable.style.length = 1;
 				} else {
-					style = new StyleRange(i, 1, null, null, SWT.NORMAL);
+					StaticVariable.style = new StyleRange(i, 1, null, null, SWT.NORMAL);
 				}
 				// 设置下划线
-				style.underline = !style.underline;
-				StaticVariable.text.setStyleRange(style);
+				StaticVariable.style.underline = !StaticVariable.style.underline;
+				StaticVariable.text.setStyleRange(StaticVariable.style);
 			}
 		}
 	}
@@ -885,7 +949,7 @@ public class MainFrame extends ApplicationWindow {
 		// 定义对话框，类型为打开型
 		FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
 		// 设置对话框打开的限定类型
-		dialog.setFilterExtensions(new String[] { " *.txt", "*.doc", "*.docx"});
+		dialog.setFilterExtensions(new String[] { "*.xml"});
 		// 打开对话框，并返回打开文件的路径
 		String openFile = dialog.open();
 		if (openFile == null) {
@@ -893,73 +957,43 @@ public class MainFrame extends ApplicationWindow {
 		}
 		// 打开指定的文件
 		file = new File(openFile);
-		String fileExtension = file.getName().substring(file.getName().indexOf("."));
-		try {
-			//读取扩展名为.doc的word文档
-			HWPFDocument doc = null;
-			//读取扩展名为.docx的word文档
-			XWPFDocument docx = null;
-			XWPFWordExtractor extractor = null;
-			//读取扩展名为.txt的文档
-			StringBuffer sb = null;
-			String fileText = null;
-			BufferedReader reader = null;
-			FileInputStream in = null;
-			if (fileExtension.equals(".doc")) {
-				in = new FileInputStream(file);
-				doc = new HWPFDocument(in);
-				fileText = doc.getDocumentText();
-				StaticVariable.questions = fileText.split(new String("#\\^"));
-				StaticVariable.text.setText(StaticVariable.questions[1]);
-			} else if (fileExtension.equals(".docx")) {
-				in = new FileInputStream(file);
-				docx = new XWPFDocument(in);
-				extractor = new XWPFWordExtractor(docx);
-				fileText = extractor.getText();
-				StaticVariable.questions = fileText.split(new String("#\\^"));
-				StaticVariable.text.setText(StaticVariable.questions[1]);
-			}
-			else {
-				// 读取文件
-				FileReader fileReader = new FileReader(file);
-				// 把字符流的字符读入缓冲区
-				reader = new BufferedReader(fileReader);
-				sb = new StringBuffer();
-				String line = null;
-				while ((line = reader.readLine()) != null) {
-					// 通过 append() 方法实现将字符串添加到字符缓冲区。
-					sb.append(line);
-					sb.append("\r\n");
-				}
-				// 将读取的文件用字符串"#^"分开，因为'^'是转义字符，所以前面要加\\
-				StaticVariable.questions = sb.toString().split(new String("#\\^"));	
-				StaticVariable.text.setText(StaticVariable.questions[1]);
-			}
-			System.out.println(StaticVariable.questions.length);
-			int num = StaticVariable.questions.length - 1;
-			String fileName = file.getName();
-			shell.setText(APPNAME + "-" + file);
-			StaticVariable.tableName = fileName.substring(0, fileName.indexOf("."));
-			dbService.createTable(num, StaticVariable.tableName);
-			
-			//有文件，启用按钮
-			first.setEnabled(true);
-			previous.setEnabled(true);
-			next.setEnabled(true);
-			last.setEnabled(true);
-			if (reader != null) {
-				reader.close();				
-			}
-			if (in != null) {
-				in.close();
-			}
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		new XmlToJavaBean(file);
+		
+//		try {
+//			
+//			// 读取文件
+//			FileReader fileReader = new FileReader(file);
+//			// 把字符流的字符读入缓冲区
+//			BufferedReader reader = new BufferedReader(fileReader);
+//			StringBuffer sb = new StringBuffer();
+//			String line = null;
+//			while ((line = reader.readLine()) != null) {
+//				// 通过 append() 方法实现将字符串添加到字符缓冲区。
+//				sb.append(line);
+//				sb.append("\r\n");
+//			}
+//			
+//			int num = StaticVariable.questions.length - 1;
+//			String fileName = file.getName();
+//			shell.setText(APPNAME + "-" + file);
+//			StaticVariable.tableName = fileName.substring(0, fileName.indexOf("."));
+//			dbService.createTable(num, StaticVariable.tableName);
+//			
+//			//有文件，启用按钮
+////			first.setEnabled(true);
+////			previous.setEnabled(true);
+////			next.setEnabled(true);
+////			last.setEnabled(true);
+//			if (reader != null) {
+//				reader.close();				
+//			}
+//			return true;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		return false;
 	}
 
