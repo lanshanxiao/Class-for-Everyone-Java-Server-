@@ -32,6 +32,7 @@ public class PrepareLessons {
 		this.parent = parent;
 		// 执行窗口弹出
 		new PrepareShell(parent.getShell()).open();
+		// 每次成功创建xml文件或者关闭创建文件的窗口都有清空所有存储题目的list
 		StaticVariable.choiceList.clear();
 		StaticVariable.trueOrFalseList.clear();
 		StaticVariable.fillblanksList.clear();
@@ -66,14 +67,13 @@ class PrepareShell extends Dialog {
 	 */
 	protected void createContents() {
 		// 创建一个窗口
-		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
         shell.setText("课前备题");
         shell.setSize(500, 500);
         
         shell.addShellListener(new ShellAdapter() {
         	@Override
         	public void shellClosed(ShellEvent e) {
-        		
     			MessageBox messageBox = new MessageBox(shell, SWT.YES | SWT.NO);
     			messageBox.setText("警告");
     			messageBox.setMessage("确定要退出吗？");

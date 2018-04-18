@@ -6,7 +6,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -41,8 +44,6 @@ public class ServerThread implements Runnable {
 	private DBServiceUser dbServiceUser;
 	// 操作成绩表数据库
 	private DBService dbService;
-	// 接收学生的答案
-	private String[] answers;
 	
 	public ServerThread(Socket s) throws IOException {
 		this.s = s;
@@ -57,7 +58,6 @@ public class ServerThread implements Runnable {
 	public void run() {
 		
 		String content = null;
-		int index = 0;
 		ipAddress = s.getInetAddress().toString().substring(1);
 		// 采用循环不断从Socket中读取客户端发送过来的数据
 		while ((content = readFromClient()) != null) {
@@ -66,61 +66,139 @@ public class ServerThread implements Runnable {
 //			System.out.println(Arrays.toString(info));
 			switch(info[0]) {
 				// 读取注册信息
+				// 客户端发送过来的字符串格式：操作编号,手机号,昵称,密码,邮箱
 				case "1":
 					if (dbServiceUser.addUser(info)) {
+						// 注册成功
 						sendToClient("1");
 					} else {
+						// 注册失败
 						sendToClient("1-false");
 					}
 					break;
 				// 读取登录信息
+				// 客户端发送过来的字符串格式：操作编号,手机或邮箱,密码
 				case "2":
 					if (dbServiceUser.getUserByNameAndPassword(info[1], info[2])) {
 						// 有客户端连接就把连接的客户端使用map存储
 						try {
 							System.out.println("客户端连接成功！！！");
 							StaticVariable.users.put(s.getInetAddress().toString().substring(1), new OnlineUser(s));
+							StaticVariable.answers.put(info[1], "");
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
+							System.out.println("登录失败...");
 							e.printStackTrace();
 						}
+						// 登录成功
 						sendToClient("2");
-						System.out.println("登录了。。。。。");
+//						System.out.println("登录了。。。。。");
 						StaticVariable.users.get(ipAddress).setInetAddress(s.getInetAddress().toString().substring(1));
 						StaticVariable.users.get(ipAddress).setUsername(info[1]);
 					} else {
+						// 登录失败
 						sendToClient("2-false");
 					}
 					break;
 				// 读取回答问题的信息
+				// 客户端发送过来的字符串格式：操作编号,昵称,内容
 				case "3":
-					if (StaticVariable.questions != null) {
-						if (answers == null) {
-							answers = new String[StaticVariable.questions.length - 1];
-							answers[index] = info[2];
-							index++;						
-						} else {
-							if (index < answers.length) {
-								System.out.println(info[2]);
-								answers[index] = info[2];
-								if (index == answers.length - 1) {
-									System.out.println(Arrays.toString(answers));
-									dbService.addRecord(info[1], StaticVariable.tableName, answers);
+					Display.getDefault().syncExec(new Runnable() {
+						
+						@Override
+						public void run() {
+							// StaticVariable.questionSelect.getSelectionIndex() > 0表示已经选择题目，可以进行答题
+							if (StaticVariable.questionSelect.getSelectionIndex() > 0) {
+								String[] answers = info[2].split(" ");
+								// 保存用户回答的答案
+								List<String> answerList = new ArrayList<>();
+								StaticVariable.answers.put(info[1], "");
+								StaticVariable.answers.replace(info[1], info[2]);
+								int index = StaticVariable.questionSelect.getSelectionIndex();
+								String[] strs = StaticVariable.questionsMap.get(Integer.toString(index)).split(",");						
+								// answers.length > 1 表示有多个答案
+								if (answers.length > 1) {
+									// 多个答案用空隔分开，过滤掉多余的空隔
+									for (int i = 0; i < answers.length; i++) {
+										if (!answers[i].equals("")) {
+											answerList.add(answers[i]);
+										}
+									}
+									// 初始化存储正确答案个数，错误答案个数，未回答个数的list
+									for (int i = 3; i < strs.length; i++) {
+										StaticVariable.correct.add(new Integer(0));
+										StaticVariable.error.add(new Integer(0));
+										StaticVariable.unResponse.add(new Integer(0));					
+									}
+									// 分别计算回答正确和回答错误的个数
+									for (int i = 3; i < strs.length; i++) {
+										// 判断正确与否
+										if (strs[i].equals(answerList.get(i - 3))) {
+											// 回答正确
+											int value = StaticVariable.correct.get(i - 3).intValue();
+											value++;
+											StaticVariable.correct.set(i - 3, new Integer(value));
+										} else {
+											// 回答错误
+											int value = StaticVariable.error.get(i - 3).intValue();
+											value++;
+											StaticVariable.error.set(i - 3, new Integer(value));
+										}
+									}
+								} else {
+									// 初始化存储正确答案个数，错误答案个数，未回答个数的list
+									StaticVariable.correct.add(new Integer(0));
+									StaticVariable.error.add(new Integer(0));
+									StaticVariable.unResponse.add(new Integer(0));
+									// 只有一个答案
+									answerList.add(info[2]);
+									// 判断正确与否
+									if (answerList.get(0).equals(strs[3])) {
+										// 回答正确
+										int value = StaticVariable.correct.get(0).intValue();
+										value++;
+										StaticVariable.correct.set(0, new Integer(value));
+									} else {
+										// 回答错误
+										int value = StaticVariable.error.get(0).intValue();
+										value++;
+										StaticVariable.error.set(0, new Integer(value));
+									}
 								}
-								index++;
-							} else {
-								index = 0;
-							}							
+								System.out.println(StaticVariable.answers);
+								System.out.println(answerList);
+								System.out.println(StaticVariable.correct);
+								System.out.println(StaticVariable.error);
+							}
 						}
-					}
+					});
 //					System.out.println(info[2]);
 					break;
 				// 读取提问的信息，并且弹框提示有学生提问
+				// 客户端发送过来的字符串格式：操作编号,昵称,内容
 				case "4":
+					// question为最终显示的提问的内容
 					question = info[1] + ":::" + info[2]; 
 					new Thread(new ListenningMessage(question)).start();
 					StaticVariable.users.get(ipAddress).setContent(info[2]);
 					System.out.println(info[0] + "," + info[1] + "," + info[2]);				
+					break;
+				// 忘记密码，重置密码
+				// 客户端发送过来的字符串格式：操作编号,手机或邮箱,密码
+				case "5":
+					// 若密码为null，则表示是查询手机号或邮箱是否已经注册过
+					if (info[2].equals("null")) {
+						if (dbServiceUser.getByUsername(info[1])) {
+							// 注册过给客户端发送成功提示
+							sendToClient("5");
+						} else {
+							// 未注册过给客户端发送失败提示
+							sendToClient("5-false");
+						}
+					} else {
+						// 若密码不是null，则表示是修改密码
+						dbServiceUser.updatePassword(info[1], info[2]);
+						sendToClient("5");
+					}
 					break;
 			}
 			
@@ -179,6 +257,7 @@ public class ServerThread implements Runnable {
 		}
 	}
 	
+	// 获取连接的客户端的ip地址
 	public static String getIpAddress() {
 		return ipAddress;
 	}
@@ -186,7 +265,7 @@ public class ServerThread implements Runnable {
 }
 
 /**
- * 当客户端有消息发送过来时，执行线程
+ * 当客户端有消息发送过来时，执行线程，显示客户端的提问信息
  * @author wanli
  *
  */

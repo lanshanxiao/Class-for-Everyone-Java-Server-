@@ -12,6 +12,7 @@ public class TrueOrFalseComposite extends Composite {
 		addComposite();
 	}
 	
+	// 添加是非题的面板
 	public void addComposite() {
 		TrueOrFalseComposite trueOrFalseCom = this;
 		new QuestionBasic(parent, trueOrFalseCom);

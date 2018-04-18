@@ -34,6 +34,7 @@ public class XmlToJavaBean {
 			List<TrueOrFalse> tofQs = q.getTrueOrFalseList();
 			List<FillInTheBlanks> fbQs = q.getFillBlanksList();
 			// 遍历所有的选择题
+			// 选择题存储类型：编号,类型,问题,答案,选项A,选项B,.... 
 			if (choiceQs != null && choiceQs.size() > 0) {
 				for (ChoiceQuestion choice: choiceQs) {
 					str.append(choice.getNo());
@@ -49,6 +50,7 @@ public class XmlToJavaBean {
 				}
 			}
 			// 遍历所有的是非题
+			// 是非题存储类型：编号,类型,问题,答案
 			if (tofQs != null && tofQs.size() > 0) {
 				for (TrueOrFalse tof: tofQs) {
 					str.append(tof.getNo());
@@ -61,6 +63,7 @@ public class XmlToJavaBean {
 				}
 			}
 			// 遍历所有的填空题
+			// 填空题存储类型：编号,类型,问题,答案1,答案2....
 			if (fbQs != null && fbQs.size() > 0) {
 				for (FillInTheBlanks fb: fbQs) {
 					str.append(fb.getNo());

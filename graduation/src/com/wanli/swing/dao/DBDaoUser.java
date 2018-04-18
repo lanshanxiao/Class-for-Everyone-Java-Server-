@@ -87,11 +87,11 @@ public class DBDaoUser {
 	}
 	
 	/**
-	 * 通过手机号码修改帐号密码
+	 * 通过手机号码或者邮箱修改帐号密码
 	 * @param parameter:参数可能是电话号码，也可能是邮箱
 	 * @param password:新密码
 	 */
-	public void updatePassword(String parameter, String password) {
+	public boolean updatePassword(String parameter, String password) {
 		PreparedStatement statement = null;
 		String sql = "";
 		boolean result = parameter.matches("[0-9]+");
@@ -109,13 +109,45 @@ public class DBDaoUser {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return true;
+	}
+	
+	/**
+	 * 根据手机号或者邮箱查找用户
+	 * @param username
+	 * @return
+	 */
+	public boolean getByUsername(String username) {
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		String sql = "";
+		boolean result = username.matches("[0-9]+");
+		if (result) {
+			sql = "select * from userbean where name = ?";			
+		} else {
+			sql = "select * from userbean where email = ?";
+		}
+		Connection connection = DBUtilsUser.getConnection();
+		try {
+			statement = connection.prepareStatement(sql);
+			statement.setString(1, username);
+			resultSet = statement.executeQuery();
+			if (resultSet.next()) {
+				return true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	public static void main(String[] args) {
 		DBDaoUser daoUser = new DBDaoUser();
 //		String[] user = {"14433333333", "陈文豪3141904210", "123456", "RRT@qq.com"};
 //		daoUser.addUser(user);
-		System.out.println(daoUser.getUserByNameAndPassword("124@qq.com", "123456"));;
+//		System.out.println(daoUser.getUserByNameAndPassword("124@qq.com", "123456"));;
+		System.out.println(daoUser.getByUsername("17759083295"));
 	}
 	
 }

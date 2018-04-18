@@ -37,6 +37,7 @@ public class StaticVariable {
 	public static int onlineNumsInt = 0;								// 统计在线人数
 	public static Label onlining;										// 显示在线人数的Label
 	public static StyledText text;										// 题目文本显示
+	public static StyledText answer;									// 答案文本显示
 	public static Button refresh;										// 刷新成绩表按钮
 	public static Button scoreChartBtn;									// 以图表的形式显示当前成绩数据
 	public static Button historyCharBtn;								// 以图表的形式显示历史成绩数据
@@ -67,5 +68,11 @@ public class StaticVariable {
 	public static Map<String, String> questionsMap = new HashMap<>();	// 存储所有的问题
 	public static Combo questionSelect;									// 选择问题的下拉框
 	public static StyleRange style, range;								// 风格
-	public static Color color;
+	public static Color color;											// 设置文本颜色
+	public static List<Integer> correct = new ArrayList<>();			// 存储所有正确的个数
+	public static List<Integer> error = new ArrayList<>();				// 存储所有错误答案的个数
+	public static List<Integer> unResponse = new ArrayList<>();			// 存储所有未答题的个数
+	public static Map<String, String> answers = new HashMap<>();		// 存储每一题学生回答的所有答案
+	public static boolean firstInsert = true;							// 往成绩表中插入数据，用来标记是否是第一次插入
+	public static List<String> statisticalData;							// 存储所有统计数据
 }

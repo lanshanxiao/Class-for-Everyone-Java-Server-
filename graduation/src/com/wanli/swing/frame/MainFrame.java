@@ -20,6 +20,9 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -319,6 +322,11 @@ public class MainFrame extends ApplicationWindow {
 			GridData selectGrid = new GridData(GridData.FILL_HORIZONTAL);
 			StaticVariable.questionSelect.setLayoutData(selectGrid);
 			StaticVariable.questionSelect.addSelectionListener(new QuestionSelectComboListener());
+//			StaticVariable.refresh = new Button(scoreComp, SWT.NONE);
+//			StaticVariable.refresh.setText("刷新");
+			StaticVariable.scoreChartBtn = new Button(questionComp, SWT.NONE);
+			StaticVariable.scoreChartBtn.setText("图表数据");
+			StaticVariable.scoreChartBtn.setEnabled(false);
 //			first = new Button(questionComp, SWT.NONE);
 //			first.setText("首题");
 //			first.setEnabled(false);
@@ -338,33 +346,39 @@ public class MainFrame extends ApplicationWindow {
 
 		// 定义第二个选项卡
 		final TabItem score = new TabItem(tabFolder, SWT.NONE);
-		score.setText("成绩");
+		score.setText("答案");
 		{
 			//为该选项卡添加一个面板
-			Composite scoreComp = new Composite(tabFolder, SWT.BORDER);
-			score.setControl(scoreComp);
-			//设置该面板的布局为网格布局，设置成一列
-			scoreComp.setLayout(new GridLayout(2, false));
-			//添加一个面板，用来放置表格
-			Composite scoreTableComp = new Composite(scoreComp, SWT.BORDER);
-			//设置socreTableComp面板为充满式布局
-			scoreTableComp.setLayout(new FillLayout());
-			// 定义表格
-			StaticVariable.scoreTab = new Table(scoreTableComp, SWT.MULTI);
-			// 设置表头可见
-			StaticVariable.scoreTab.setHeaderVisible(true);
-			// 设置网格线可见
-			StaticVariable.scoreTab.setLinesVisible(true);
-			//为socreTableComp面板设置一个控制布局的对象GridTab2，设置该面板在水平、垂直两个方向全充满
-			GridData gridTab2 = new GridData(GridData.FILL_BOTH);
-			//设置socreTableComp面板垂直占两列
-			gridTab2.horizontalSpan = 2;
-			scoreTableComp.setLayoutData(gridTab2);
-			//定义一个刷新表格的按钮
-			StaticVariable.refresh = new Button(scoreComp, SWT.NONE);
-			StaticVariable.refresh.setText("刷新");
-			StaticVariable.scoreChartBtn = new Button(scoreComp, SWT.NONE);
-			StaticVariable.scoreChartBtn.setText("图表数据");
+			Composite answerComp = new Composite(tabFolder, SWT.BORDER);
+			score.setControl(answerComp);
+			answerComp.setLayout(new FillLayout());
+			StaticVariable.answer = new StyledText(answerComp, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.WRAP);
+			StaticVariable.answer.setRightMargin(40);
+			StaticVariable.answer.setLeftMargin(40);
+			StaticVariable.answer.setFont(new Font(parent.getDisplay(), "Arial", 30, SWT.NONE));
+			StaticVariable.answer.setBounds(0, 0, answerComp.getSize().x, answerComp.getSize().y);
+//			//设置该面板的布局为网格布局，设置成一列
+//			scoreComp.setLayout(new GridLayout(2, false));
+//			//添加一个面板，用来放置表格
+//			Composite scoreTableComp = new Composite(scoreComp, SWT.BORDER);
+//			//设置socreTableComp面板为充满式布局
+//			scoreTableComp.setLayout(new FillLayout());
+//			// 定义表格
+//			StaticVariable.scoreTab = new Table(scoreTableComp, SWT.MULTI);
+//			// 设置表头可见
+//			StaticVariable.scoreTab.setHeaderVisible(true);
+//			// 设置网格线可见
+//			StaticVariable.scoreTab.setLinesVisible(true);
+//			//为socreTableComp面板设置一个控制布局的对象GridTab2，设置该面板在水平、垂直两个方向全充满
+//			GridData gridTab2 = new GridData(GridData.FILL_BOTH);
+//			//设置socreTableComp面板垂直占两列
+//			gridTab2.horizontalSpan = 2;
+//			scoreTableComp.setLayoutData(gridTab2);
+//			//定义一个刷新表格的按钮
+//			StaticVariable.refresh = new Button(scoreComp, SWT.NONE);
+//			StaticVariable.refresh.setText("刷新");
+//			StaticVariable.scoreChartBtn = new Button(scoreComp, SWT.NONE);
+//			StaticVariable.scoreChartBtn.setText("图表数据");
 		}
 
 		// 定义第三个选项卡
@@ -402,8 +416,8 @@ public class MainFrame extends ApplicationWindow {
 			StaticVariable.historyCombo.setLayoutData(moduleGrid);
 			//为下拉框添加监听事件
 			StaticVariable.historyCombo.addSelectionListener(new HistoryComboListener(StaticVariable.historyCombo));
-			StaticVariable.historyCharBtn = new Button(historyComp, SWT.NONE);
-			StaticVariable.historyCharBtn.setText("图表数据");
+//			StaticVariable.historyCharBtn = new Button(historyComp, SWT.NONE);
+//			StaticVariable.historyCharBtn.setText("图表数据");
 		}
 		
 		// 定义第四个选项卡
@@ -445,9 +459,9 @@ public class MainFrame extends ApplicationWindow {
 //		previous.addSelectionListener(new ButtonDownListener("previous"));
 //		next.addSelectionListener(new ButtonDownListener("next"));
 //		last.addSelectionListener(new ButtonDownListener("last"));
-		StaticVariable.refresh.addSelectionListener(new ButtonDownListener("refresh"));
+//		StaticVariable.refresh.addSelectionListener(new ButtonDownListener("refresh"));
 		StaticVariable.scoreChartBtn.addSelectionListener(new ScoreChartBtnListener(parent));
-		StaticVariable.historyCharBtn.addSelectionListener(new HistoryCharBtnListener(parent));
+//		StaticVariable.historyCharBtn.addSelectionListener(new HistoryCharBtnListener(parent));
 
 		parent.getShell().addControlListener(new ControlListener() {
 
@@ -475,6 +489,61 @@ public class MainFrame extends ApplicationWindow {
 		return mainFrame;
 	}
 
+	@Override
+	protected void handleShellCloseEvent() { 
+		MessageBox messagebox = new MessageBox(getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);  
+	    messagebox.setMessage("您确定要退出吗?");  
+	    int message = messagebox.open();  
+	    if (message == SWT.YES) {
+	    	if (StaticVariable.correct.size() > 0) {
+				int index = StaticVariable.questionSelect.getSelectionIndex();
+				String question = StaticVariable.questionsMap.get(Integer.toString(index));
+				// 分割字符串，将题目答案等分离
+				String[] strs = question.split(",");
+				if ((strs.length - 4) > 0) {
+					// (strs.length - 4) > 0表示有多个答案
+					StringBuffer answer = new StringBuffer();	// 存储问题的答案
+					StringBuffer corStr = new StringBuffer();	// 存储回答正确的个数，多个答案使用空格分隔
+					StringBuffer errStr = new StringBuffer();	// 存储回答错误的个数，多个答案使用空格分隔
+					StringBuffer unResStr = new StringBuffer();	// 存储未回答的个数，多个答案使用空格分隔
+					// 根据正确的数量和错误的数量计算出未回答的数量
+					for (int i = 0; i < StaticVariable.correct.size(); i++) {
+						int unResponse = StaticVariable.unResponse.get(i).intValue();
+						int correct = StaticVariable.correct.get(i).intValue();
+						int error = StaticVariable.error.get(i).intValue();
+						unResponse = StaticVariable.users.size() - correct - error;
+						StaticVariable.unResponse.set(i, new Integer(unResponse));
+						if (i == 0) {
+							answer.append(strs[i + 3]);
+							corStr.append(correct);
+							errStr.append(error);
+							unResStr.append(unResponse);
+						} else {
+							answer.append(" " + strs[i + 3]);
+							corStr.append(" " + correct);
+							errStr.append(" " + error);
+							unResStr.append(" " + unResponse);
+						}
+					}
+					String countStr = answer.toString() + "," + corStr.toString() + "," + errStr.toString() + "," + unResStr.toString();
+					StaticVariable.answers.put("统计", countStr);
+					System.out.println(countStr);
+				} else {
+					int unResponse = StaticVariable.unResponse.get(0).intValue();
+					int correct = StaticVariable.correct.get(0).intValue();
+					int error = StaticVariable.error.get(0).intValue();
+					unResponse = StaticVariable.users.size() - correct - error;
+					StaticVariable.unResponse.set(0, new Integer(unResponse));
+					String countStr = Integer.toString(correct) + "," + Integer.toString(error) + "," + Integer.toString(unResponse);
+					StaticVariable.answers.put("统计", countStr);
+				}
+				System.out.println(StaticVariable.correct.size());
+				dbService.addRecord(StaticVariable.tableName, StaticVariable.answers, index);
+			}
+	        super.handleShellCloseEvent();  
+	    }
+		
+	}
 	protected MenuManager createMenuManager() {
 		MenuManager menuBar = new MenuManager();
 		MenuManager fileMenu = new MenuManager(" 文件(&F)");
@@ -958,7 +1027,10 @@ public class MainFrame extends ApplicationWindow {
 		// 打开指定的文件
 		file = new File(openFile);
 		new XmlToJavaBean(file);
-		
+		shell.setText(APPNAME + "-" + file);
+		String fileName = file.getName();
+		StaticVariable.tableName = fileName.substring(0, fileName.indexOf("."));
+		dbService.createTable(StaticVariable.questionsMap.size(), StaticVariable.tableName);
 //		try {
 //			
 //			// 读取文件

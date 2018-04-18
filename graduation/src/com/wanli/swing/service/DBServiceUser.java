@@ -43,4 +43,13 @@ public class DBServiceUser {
 		daoUser.updatePassword(parameter, password);
 	}
 	
+	/**
+	 * 根据手机号或者邮箱查找用户
+	 * @param username
+	 * @return
+	 */
+	public boolean getByUsername(String username) {
+		return daoUser.getByUsername(username);
+	}
+	
 }

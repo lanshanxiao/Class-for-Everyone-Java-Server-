@@ -1,6 +1,7 @@
 package com.wanli.swing.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.wanli.swing.dao.DBDao;
 
@@ -48,11 +49,22 @@ public class DBService {
 	}
 	
 	/**
-	 * 向表中添加记录
+	 * 向表中添加数据
 	 * @param userName：用户名
 	 * @param tableName：表名
+	 * @param answers：某一题用户所有的回答
+	 * @param columnNum：第几题
 	 */
-	public void addRecord(String userName, String tableName, String[] answers) {
-		dbDao.addRecord(userName, tableName, answers);
+	public void addRecord(String tableName, Map<String, String> answers, int columnNum) {
+		dbDao.addRecord(tableName, answers, columnNum);
+	}
+	
+	/**
+	 * 获取表中的最后一行的统计数据
+	 * @param tableName
+	 * @return
+	 */
+	public List<String> getStatisticalData(String tableName) {
+		return dbDao.getStatisticalData(tableName); 
 	}
 }

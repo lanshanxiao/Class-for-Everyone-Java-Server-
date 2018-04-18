@@ -44,7 +44,7 @@ public class MyServer implements Runnable {
 				e.printStackTrace();
 			}
 			if (s != null) {
-//				System.out.println("客户端连接成功！！！");
+				System.out.println("客户端连接成功！！！");
 //				try {
 //					
 //				} catch (IOException e) {

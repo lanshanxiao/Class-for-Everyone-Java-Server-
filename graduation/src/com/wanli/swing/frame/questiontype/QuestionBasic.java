@@ -52,6 +52,11 @@ public class QuestionBasic {
 		answerText.setLayoutData(optionGrid);
 		
 		if (child instanceof TrueOrFalseComposite) {
+			Label tip1 = new Label(child, SWT.NONE);
+			tip1.setText("提示：");
+			Label tip2 = new Label(child, SWT.NONE);
+			tip2.setText("是非题答案正确请输入T，错误输入F！");
+			tip2.setLayoutData(optionGrid);
 			StaticVariable.trueOrFalseAllText.put("question", questionText);
 			StaticVariable.trueOrFalseAllText.put("answer", answerText);
 		}
