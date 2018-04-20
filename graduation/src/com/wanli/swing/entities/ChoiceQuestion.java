@@ -1,5 +1,6 @@
 package com.wanli.swing.entities;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -9,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement(name = "choice_question")
-public class ChoiceQuestion {
+public class ChoiceQuestion implements Serializable {
 
 	private String no;				// 题目编号
 	private String question;		// 题目

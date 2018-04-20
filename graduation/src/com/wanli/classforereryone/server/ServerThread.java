@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
 
 import com.wanli.swing.Mmmm;
+import com.wanli.swing.entities.ChoiceQuestion;
 import com.wanli.swing.entities.OnlineUser;
 import com.wanli.swing.frame.MessagePOP_UP;
 import com.wanli.swing.service.DBService;
@@ -33,13 +34,15 @@ import com.wanli.utils.StaticVariable;
 public class ServerThread implements Runnable {
 
 	// 定义当前线程所处理的Socket
-	private Socket s = null;
+	private static Socket s = null;
 	// 该线程所处理的Socket所对应的输入流
 	BufferedReader br = null;
 	// 接收连接上服务端的客户端IP地址
 	private static String ipAddress = "";
 	// 存储学生提出的问题
 	private String question;
+	// 存储所有教室
+	private StringBuilder allClass = new StringBuilder();
 	// 操作用户数据库
 	private DBServiceUser dbServiceUser;
 	// 操作成绩表数据库
@@ -79,6 +82,7 @@ public class ServerThread implements Runnable {
 				// 读取登录信息
 				// 客户端发送过来的字符串格式：操作编号,手机或邮箱,密码
 				case "2":
+//					System.out.println(Arrays.toString(info));
 					if (dbServiceUser.getUserByNameAndPassword(info[1], info[2])) {
 						// 有客户端连接就把连接的客户端使用map存储
 						try {
@@ -89,11 +93,13 @@ public class ServerThread implements Runnable {
 							System.out.println("登录失败...");
 							e.printStackTrace();
 						}
+						
 						// 登录成功
 						sendToClient("2");
 //						System.out.println("登录了。。。。。");
 						StaticVariable.users.get(ipAddress).setInetAddress(s.getInetAddress().toString().substring(1));
 						StaticVariable.users.get(ipAddress).setUsername(info[1]);
+System.out.println("....2");
 					} else {
 						// 登录失败
 						sendToClient("2-false");
@@ -200,6 +206,28 @@ public class ServerThread implements Runnable {
 						sendToClient("5");
 					}
 					break;
+				// 向客户端发送教室信息
+				case "6":
+					if (StaticVariable.rooms.size() > 0) {
+						allClass.setLength(0);
+						for (int i = 0; i < StaticVariable.rooms.size(); i++) {
+							if (i == 0) {
+								allClass.append(StaticVariable.rooms.get(i).getText());									
+							} else {
+								allClass.append("," + StaticVariable.rooms.get(i).getText());
+							}
+						}							
+					}
+					// 向客户端发送教室信息
+					sendToClient(allClass.toString());
+					break;
+				// 获取题目
+				case "7":
+					int index = StaticVariable.questionSelect.getSelectionIndex();
+					if (index > 0) {
+						sendToClient(StaticVariable.questionsMap.get(Integer.toString(index)));
+					}
+					break;
 			}
 			
 		}
@@ -239,6 +267,28 @@ public class ServerThread implements Runnable {
 		}
 	}
 	
+//	public static void sendToClient(ChoiceQuestion choice) {
+//		String no = "1";
+//		String question = "1111";
+//		List<String> options = new ArrayList<>();
+//		options.add("A.1");
+//		options.add("B.2");
+//		options.add("C.3");
+//		options.add("D.4");
+//		String answer = "A";
+//		choice = new ChoiceQuestion(no, question, answer, options);
+//		PrintWriter pw = null;
+//		try {
+//			pw = new PrintWriter(s.getOutputStream());
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		};
+//		if (pw != null) {
+//			pw.println(choice);  
+//			pw.flush();			
+//		}
+//	}
+	
 	/**
 	 * 向客户端发送消息
 	 * @param msg
@@ -253,7 +303,8 @@ public class ServerThread implements Runnable {
 		};
 		if (pw != null) {
 			pw.println(msg);  
-			pw.flush();			
+			pw.flush();	
+System.out.println("发送消息");
 		}
 	}
 	

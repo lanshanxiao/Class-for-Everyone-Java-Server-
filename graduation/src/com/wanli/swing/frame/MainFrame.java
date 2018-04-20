@@ -26,6 +26,7 @@ import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -117,9 +118,9 @@ public class MainFrame extends ApplicationWindow {
 	public MainFrame(String userName) {
 		// 部署窗口
 		super(null);
-		//开启一个线程，用来监听客户端的连接
+		// 开启一个线程，用来监听客户端的连接
 		new Thread(new MyServer()).start();
-		//开启一个线程，监听客户端的连接，监听到有客户端连接上就显示客户端的连接情况
+		// 开启一个线程，监听客户端的连接，监听到有客户端连接上就显示客户端的连接情况
 		new Thread(new ListeningSocket()).start();
 		this.userName = userName;// 获取用户名
 		newCreate = new NewCreate();
@@ -141,8 +142,11 @@ public class MainFrame extends ApplicationWindow {
 	}
 
 	public void run() {
+		// 直到窗口关闭方能从 open() 方法返回
 		setBlockOnOpen(true);
+		// 打开窗口
 		open();
+		// 关闭窗口，释放在操作系统中用到的资源
 		Display.getCurrent().dispose();
 	}
 	
@@ -159,6 +163,7 @@ public class MainFrame extends ApplicationWindow {
 		shell.setLocation(x, y);
 	}
 
+	// 设置窗体外观
 	@Override
 	public Control createContents(Composite parent) {
 		// 设置窗体大小
@@ -181,7 +186,7 @@ public class MainFrame extends ApplicationWindow {
 		Composite createRoom = new Composite(onlineView, SWT.BORDER);
 		createRoom.setBounds(0, 0, onlineView.getSize().x, (int) (onlineView.getSize().y * 0.04));
 		createRoom.setLayout(new FillLayout());
-		
+		// 创建教室按钮
 		Button button = new Button(createRoom, SWT.NONE);
 		FormData fd_button = new FormData();
 		fd_button.left = new FormAttachment(0);
@@ -193,6 +198,7 @@ public class MainFrame extends ApplicationWindow {
 				ServerThread.sendToAllClient("开启霸屏");
 			}
 		});
+		// 截图按钮
 		Button screenshot = new Button(createRoom, SWT.NONE);
 		screenshot.setText("教学截图");
 		screenshot.setLayoutData(fd_button);
@@ -277,34 +283,42 @@ public class MainFrame extends ApplicationWindow {
 			// 添加全选菜单
 			MenuItem selectAllItem = new MenuItem(menu, SWT.PUSH);
 			selectAllItem.setText("全选");
+			selectAllItem.setImage(new Image(parent.getDisplay(), "image/select_all.png"));
 			selectAllItem.addSelectionListener(new SelectAll());
 			// 添加复制菜单
 			MenuItem copyItem = new MenuItem(menu, SWT.PUSH);
 			copyItem.setText("复制");
+			copyItem.setImage(new Image(parent.getDisplay(), "image/copy.png"));
 			copyItem.addSelectionListener(new CopyText());
 			// 添加黏贴菜单
 			MenuItem pasteItem = new MenuItem(menu, SWT.PUSH);
 			pasteItem.setText("黏贴");
+			pasteItem.setImage(new Image(parent.getDisplay(), "image/paste.png"));
 			pasteItem.addSelectionListener(new PasteText());
 			// 添加剪切菜单
 			MenuItem cutItem = new MenuItem(menu, SWT.PUSH);
 			cutItem.setText("剪切");
+			cutItem.setImage(new Image(parent.getDisplay(), "image/cut.png"));
 			cutItem.addSelectionListener(new CutText());
 			// 添加加粗菜单
 			MenuItem boldItem = new MenuItem(menu, SWT.PUSH);
 			boldItem.setText("加粗");
+			boldItem.setImage(new Image(parent.getDisplay(), "image/bold.png"));
 			boldItem.addSelectionListener(new BoldFont());
 			// 添加斜体菜单
 			MenuItem italicItem = new MenuItem(menu, SWT.PUSH);
 			italicItem.setText("斜体");
+			italicItem.setImage(new Image(parent.getDisplay(), "image/italic.png"));
 			italicItem.addSelectionListener(new ItalicText());
 			// 添加下划线菜单
 			MenuItem underlineItem = new MenuItem(menu, SWT.PUSH);
 			underlineItem.setText("下划线");
+			underlineItem.setImage(new Image(parent.getDisplay(), "image/underline.png"));
 			underlineItem.addSelectionListener(new UnderlineText());
 			// 添加设置颜色菜单
 			MenuItem colorItem = new MenuItem(menu, SWT.PUSH);
 			colorItem.setText("设置颜色");
+			colorItem.setImage(new Image(parent.getDisplay(), "image/font_color.png"));
 			colorItem.addSelectionListener(new SetTextColor());
 			StaticVariable.text.setMenu(menu);
 			//为socreTableComp面板设置一个控制布局的对象GridTab1，设置该面板在水平、垂直两个方向全充满
@@ -489,6 +503,7 @@ public class MainFrame extends ApplicationWindow {
 		return mainFrame;
 	}
 
+	// 点击关闭窗口按钮时触发的动作
 	@Override
 	protected void handleShellCloseEvent() { 
 		MessageBox messagebox = new MessageBox(getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);  
@@ -552,18 +567,22 @@ public class MainFrame extends ApplicationWindow {
 		// 在文件菜单项添加下拉菜单
 		fileMenu.add(newCreate);
 		fileMenu.add(openFile);
+		// 添加分割线
 		fileMenu.add(new Separator());
 		fileMenu.add(saveFile);
 		fileMenu.add(saveAsFile);
+		// 添加分割线
 		fileMenu.add(new Separator());
 		fileMenu.add(exit);
 		// 在编辑菜单下添加下拉菜单
 		editorMenu.add(copyFile);
 		editorMenu.add(pasteFile);
 		editorMenu.add(cutFile);
+		// 添加分割线
 		editorMenu.add(new Separator());
 		editorMenu.add(setFont);
 		editorMenu.add(setColor);
+		// 添加分割线
 		editorMenu.add(new Separator());
 		editorMenu.add(selectAll);
 		editorMenu.add(formate);
@@ -603,6 +622,13 @@ public class MainFrame extends ApplicationWindow {
 		public NewCreate() {
 			super("NewCreateAction@Ctrl+N", Action.AS_PUSH_BUTTON);
 			setText(" 新建教室");
+			try {
+				// 载入图像
+				ImageDescriptor icon = ImageDescriptor.createFromURL(new URL("file:image/createclass.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				System.err.println(e.getMessage());
+			}
 		}
 
 		public void run() {
@@ -644,6 +670,13 @@ public class MainFrame extends ApplicationWindow {
 		public OpenFile() {
 			super("OpenFileAction@Ctrl+O", Action.AS_PUSH_BUTTON);
 			setText(" 打开");
+			try {
+				// 载入图像
+				ImageDescriptor icon = ImageDescriptor.createFromURL(new URL("file:image/folder.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				System.err.println(e.getMessage());
+			}
 		}
 
 		public void run() {
@@ -710,8 +743,14 @@ public class MainFrame extends ApplicationWindow {
 		public SaveFileAction() {
 			super("SaveFileAction@Ctrl+S", Action.AS_PUSH_BUTTON);
 			setText(" 保存");
+			try {
+				// 载入图像
+				ImageDescriptor icon = ImageDescriptor.createFromURL(new URL("file:image/save.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
-
 		public void run() {
 			saveTextFile();
 		}
@@ -725,6 +764,14 @@ public class MainFrame extends ApplicationWindow {
 	class SaveAsFileAction extends Action {
 		public SaveAsFileAction() {
 			super(" 另存为@Alt+A", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/saveas.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -740,6 +787,14 @@ public class MainFrame extends ApplicationWindow {
 	class ExitAction extends Action {
 		public ExitAction() {
 			super(" 退出@Ctrl+E", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/close.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -756,6 +811,14 @@ public class MainFrame extends ApplicationWindow {
 		public CopyFileAction() {
 			super("CopyFileAction@Ctrl+C", Action.AS_PUSH_BUTTON);
 			setText(" 复制");
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/copy.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -772,6 +835,14 @@ public class MainFrame extends ApplicationWindow {
 		public PasteFileAction() {
 			super("PasteFileAction@Ctrl+V", Action.AS_PUSH_BUTTON);
 			setText(" 粘贴");
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/paste.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -788,6 +859,14 @@ public class MainFrame extends ApplicationWindow {
 		public CutFileAction() {
 			super("CutFileAction @Ctrl+X", Action.AS_PUSH_BUTTON);
 			setText(" 剪切");
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/cut.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -803,6 +882,14 @@ public class MainFrame extends ApplicationWindow {
 	class SetFontAction extends Action {
 		public SetFontAction() {
 			super(" 设置字体@Alt+F", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/font.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -827,6 +914,14 @@ public class MainFrame extends ApplicationWindow {
 	class SetColorAction extends Action {
 		public SetColorAction() {
 			super(" 设置颜色@Alt+C", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/font_color.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -870,6 +965,14 @@ public class MainFrame extends ApplicationWindow {
 	class SelectAllAction extends Action {
 		public SelectAllAction() {
 			super(" 全选@Ctrl+A", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/select_all.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
