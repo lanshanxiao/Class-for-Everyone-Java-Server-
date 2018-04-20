@@ -34,6 +34,7 @@ public class ServerThread implements Runnable {
 		String content = null;
 		//采用循环不断从Socket中读取客户端发送过来的数据
 		while ((content = readFromClient()) != null) {
+			System.out.println(content);
 			String[] info = content.split(",");
 			StaticVariable.users.get(s.getInetAddress().toString().substring(1)).setInetAddress(s.getInetAddress().toString().substring(1));
 			StaticVariable.users.get(s.getInetAddress().toString().substring(1)).setUsername(info[0]);

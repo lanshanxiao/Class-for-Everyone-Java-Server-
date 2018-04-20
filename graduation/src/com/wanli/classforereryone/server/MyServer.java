@@ -35,6 +35,7 @@ public class MyServer implements Runnable {
 			Socket s = null;
 			try {
 				s = ss.accept();
+System.out.println(s.getInetAddress().toString());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

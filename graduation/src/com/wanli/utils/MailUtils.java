@@ -35,8 +35,8 @@ public class MailUtils {
 		 */
 		// 1.获得连接对象
 		// 登录官方帐号，用来给注册的邮箱发送验证码
-		String userName = "hwl123me@163.com";
-		String userPwd = "hlq0830wb";
+		final String userName = "hwl123me@163.com";
+		final String userPwd = "hlq0830wb";
 		//配置发送邮件的属性
 		Properties props = new Properties();
 		//配置发送服务器，使用网易的163服务器
