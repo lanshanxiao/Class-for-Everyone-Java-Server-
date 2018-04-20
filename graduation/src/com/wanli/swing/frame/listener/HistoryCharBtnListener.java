@@ -6,7 +6,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 
-import com.wanli.utils.CharTableUtil;
+import com.wanli.utils.SingleAnswerChartTableUtil;
 import com.wanli.utils.StaticVariable;
 
 public class HistoryCharBtnListener implements SelectionListener {
@@ -27,7 +27,7 @@ public class HistoryCharBtnListener implements SelectionListener {
 		System.out.println(StaticVariable.historyCombo.getText());
 		tableName = StaticVariable.historyCombo.getText();
 		if (tableName != null && tableName != "") {
-			new CharTableUtil(parent.getShell(), tableName).open();
+			new SingleAnswerChartTableUtil(parent.getShell(), tableName).open();
 		} else {
 			MessageBox messageBox = new MessageBox(parent.getShell(), SWT.YES);
     		messageBox.setText("Í¼±í");

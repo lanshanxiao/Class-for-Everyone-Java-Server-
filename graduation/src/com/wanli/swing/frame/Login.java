@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.wanli.swing.dao.DBDaoUser;
 import com.wanli.swing.dao.RegistDao;
 import com.wanli.swing.entities.UserBean;
 import com.wanli.swing.frame.listener.ComboListener;
@@ -41,13 +42,15 @@ public class Login {
 	private static UserBean user;				// 用户信息的bean
 	private static Image coverImg;				// 图片
 	private static Properties userProp;			// 读取保存的登录信息，用于下拉列表框显示
-	private static Properties saveProp;			// 读取保存的登录信息，用于显示上一次退出时的帐号
-	private static FileInputStream inStream;		// 输入流，读取信息
+	private static Properties saveProp;			// 读取保存的登录信息，用于存储上一次退出时的帐号
+	private static FileInputStream inStream;	// 输入流，读取信息
 	private static FileWriter writer;			// 输出流，写信息
 	private static File userFile;				// 读取保存用户信息的文件
 	private static File saveFile;				// 读取保存上一次退出时帐号的信息
 	private static Set<Object> itSet;			// 保存所有信息
 	private static Iterator keys;				// 用于遍历所有信息
+	private static Display display;
+	private static Shell shell;
 
 	/**
 	 * 初始化属性
@@ -57,10 +60,13 @@ public class Login {
 		userProp = new Properties();
 		saveProp = new Properties();
 		
-		userFile = new File("users.properties");
+		// 创建File对象
+		userFile = new File("users.properties");		
 		saveFile = new File("savecount.properties");
 		try {
+			// 创建文件输入流
 			inStream = new FileInputStream(userFile);
+			// 从输入流中加载内容
 			userProp.load(inStream);
 			inStream = new FileInputStream(saveFile);
 			saveProp.load(inStream);
@@ -72,11 +78,10 @@ public class Login {
 		itSet = userProp.keySet();// 将获取的信息转为set
 		keys = itSet.iterator();
 	}
-
-	public static void main(String[] args) {
-		window = new Login();// 初始化
-		Display display = Display.getDefault();
-		Shell shell = new Shell(display, SWT.DIALOG_TRIM);
+	
+	protected static void onCreate() {
+		display = Display.getDefault();
+		shell = new Shell(display, SWT.DIALOG_TRIM);
 		shell.setImage(SWTResourceManager.getImage("image/1.jpg"));
 		shell.setSize(474, 365);
 		center(display, shell);
@@ -224,7 +229,7 @@ public class Login {
 				// 获取登录的用户名和密码
 				window.getUser().setName(comboUser.getText());
 				window.getUser().setPassword(textPassword.getText());
-				RegistDao dao = new RegistDao();
+				DBDaoUser dao = new DBDaoUser();
 				// 查找数据库确认该用户是否存在，存在则执行保存帐号操作和打开主界面
 				if (dao.getUserByNameAndPassword(window.getUser().getName(), window.getUser().getPassword())) {
 					// 清空保存上一次登录信息的文件，保存这次的登录信息
@@ -286,7 +291,11 @@ public class Login {
 		});
 		// 显示图片
 		window.setCoverImg(new Image(display, "image/1.jpg"));
+	}
 
+	public static void main(String[] args) {
+		window = new Login();// 初始化
+		onCreate();
 		shell.open();
 		shell.layout();
 
