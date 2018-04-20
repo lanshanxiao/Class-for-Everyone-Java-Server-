@@ -6,10 +6,18 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.wanli.utils.DbUtilsScoreTab;
+import com.wanli.utils.StaticVariable;
 
+/**
+ * 操作数据库的Dao层类
+ * @author wanli
+ *
+ */
 public class DBDao {
 
 	/**
@@ -25,18 +33,20 @@ public class DBDao {
 		for (int i = 1; i <= num; i++) {
 			titles.add(title + i);
 			if (i == num) {
-				sql = sql + titles.get(i - 1) + " char(10))";
+				sql = sql + titles.get(i - 1) + " char(30))";
 				break;
 			}
-			sql = sql + titles.get(i - 1) + " char(10),";
+			sql = sql + titles.get(i - 1) + " char(30),";
 			
 		}
 		try {
 			statement = connection.prepareStatement(sql);
 			statement.execute();
+			StaticVariable.firstInsert = true;
 		} catch (SQLException e) {
 //			e.printStackTrace();
 			System.out.println("创建表失败，表已经存在！请修改文件名，以保证建表成功。");
+			StaticVariable.firstInsert = false;
 		}
 	}
 	
@@ -65,6 +75,7 @@ public class DBDao {
 				list.add(titles);
 			}
 		} catch (SQLException e) {
+			System.out.println("数据库连接失败！");
 			e.printStackTrace();
 		}
 		return list;
@@ -88,6 +99,7 @@ public class DBDao {
 			ResultSetMetaData metaData = resultSet.getMetaData();
 			colCount = metaData.getColumnCount();
 		} catch (SQLException e) {
+			System.out.println("数据库连接失败！");
 			e.printStackTrace();
 		}
 		return colCount;
@@ -112,17 +124,141 @@ public class DBDao {
 				tables.add(resultSet.getString(1));
 			}
 		} catch (SQLException e) {
+			System.out.println("数据库连接失败！");
 			e.printStackTrace();
 		}
 		return tables;
 	}
 	
+	/**
+	 * 获取一张表的所有列名
+	 * @param tableName
+	 * @return
+	 */
+	public List<String> getTableColumnName(String tableName) {
+		List<String> columns = new ArrayList<>();
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		ResultSetMetaData metaData = null;
+		String sql = "select * from " + tableName;
+		Connection connection = DbUtilsScoreTab.getConnection();
+		try {
+			statement = connection.prepareStatement(sql);
+			resultSet = statement.executeQuery();
+			metaData = resultSet.getMetaData();
+			for (int i = 1; i <= metaData.getColumnCount(); i++) {
+				columns.add(metaData.getColumnName(i));
+			}
+		} catch (SQLException e) {
+			System.out.println("数据库连接失败！");
+			e.printStackTrace();
+		}
+		return columns;
+	}
+	
+	/**
+	 * 获取表中的最后一行的统计数据
+	 * @param tableName
+	 * @return
+	 */
+	public List<String> getStatisticalData(String tableName) {
+		List<String> columns = new ArrayList<>();
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		ResultSetMetaData metaData = null;
+		String sql = "select * from " + tableName + " where username = '统计'";
+		Connection connection = DbUtilsScoreTab.getConnection();
+		try {
+			statement = connection.prepareStatement(sql);
+			resultSet = statement.executeQuery();
+			metaData = resultSet.getMetaData();
+			while (resultSet.next()) {
+				for (int i = 1; i <= metaData.getColumnCount(); i++) {
+					columns.add(resultSet.getString(i));
+				}
+			}
+		} catch (SQLException e) {
+			System.out.println("数据库连接失败！");
+			e.printStackTrace();
+		}
+		return columns;
+	}
+	
+	/**
+	 * 向表中添加记录
+	 * @param userName：用户名
+	 * @param tableName：表名
+	 * @param answers：某一题的所有回答
+	 * @param columnNum：第几题
+	 */
+	public void addRecord(String tableName, Map<String, String> answers, int columnNum) {
+		PreparedStatement preparedStatement = null;
+		Connection connection = null;
+		List<String> tableColumn = getTableColumnName(tableName);
+		String sql = "";
+		connection = DbUtilsScoreTab.getConnection();
+		if (StaticVariable.firstInsert) {
+			sql = "insert into " + tableName + "(username," + tableColumn.get(columnNum) + ")"
+					+ " values(?, ?)";
+			for (Map.Entry<String, String> answer: answers.entrySet()) {
+				try {
+					preparedStatement = connection.prepareStatement(sql);
+					preparedStatement.setString(1, answer.getKey());
+					preparedStatement.setString(2, answer.getValue());
+					preparedStatement.execute();
+				} catch (SQLException e) {
+					System.out.println("数据库连接失败！");
+					e.printStackTrace();
+				}
+				
+			}
+		} else {
+			sql = "update " + tableName + " set " + tableColumn.get(columnNum) + "= ? where username = ?" ;
+			for (Map.Entry<String, String> answer: answers.entrySet()) {
+				try {
+					preparedStatement = connection.prepareStatement(sql);
+					preparedStatement.setString(1, answer.getValue());
+					preparedStatement.setString(2, answer.getKey());
+					preparedStatement.execute();
+				} catch (SQLException e) {
+					System.out.println("数据库连接失败！");
+					e.printStackTrace();
+				}
+				
+			}		
+		}
+		StaticVariable.firstInsert = false;
+//		String sql = "insert into " + tableName + " values(";
+//		for (int i = 0; i < tableColumn; i++) {
+//			if (i == tableColumn - 1) {
+//				sql += "?)";				
+//			} else {
+//				sql += "?, ";				
+//			}
+//		}
+//		connection = DbUtilsScoreTab.getConnection();
+//		try {
+//			preparedStatement = connection.prepareStatement(sql);
+//			for (int i = 0; i < tableColumn; i++) {
+//				if (i == 0) {
+//					preparedStatement.setString(i + 1, userName);
+//				} else {
+//					preparedStatement.setString(i + 1, answers[i - 1]);
+//				}
+//			}
+//			preparedStatement.executeUpdate();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+	}
+	
 	public static void main(String[] args) {
 		DBDao dao = new DBDao();
-		List<String> tables = dao.getTableList();
-		for (String table: tables) {
-			System.out.println(table);
-		}
+//		dao.addRecord("11", "ttt");
+//		List<String> tables = dao.getTableList();
+//		for (String table: tables) {
+//			System.out.println(table);
+//		}
 //		dao.createTable(4, "table1");
 //		List<String[]> list = dao.getScoreData("table1");
 //		for (String[] record: list) {
@@ -134,6 +270,13 @@ public class DBDao {
 //			}
 //		}
 //		System.out.println(dao.getTableColumn("table1"));
+//		System.out.println(dao.getTableColumnName("question"));;
+//		StaticVariable.firstInsert = false;
+//		Map<String, String> s = new HashMap<>();
+//		s.put("wan1", "a b");
+//		s.put("wan2", "c");
+//		dao.addRecord("question", s, 5);
+		System.out.println(dao.getStatisticalData("question"));
 	}
 	
 }

@@ -1,17 +1,11 @@
 package com.wanli.swing.frame;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -25,9 +19,14 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -45,32 +44,50 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import com.wanli.classforereryone.server.MyServer;
 import com.wanli.classforereryone.server.ServerThread;
+import com.wanli.swing.frame.listener.AskQuestionTableListener;
 import com.wanli.swing.frame.listener.ButtonDownListener;
 import com.wanli.swing.frame.listener.CreateClassListener;
 import com.wanli.swing.frame.listener.HistoryCharBtnListener;
 import com.wanli.swing.frame.listener.HistoryComboListener;
 import com.wanli.swing.frame.listener.OnlineTreeListener;
+import com.wanli.swing.frame.listener.QuestionSelectComboListener;
 import com.wanli.swing.frame.listener.ScoreChartBtnListener;
 import com.wanli.swing.frame.listener.TabFordlerListener;
+import com.wanli.swing.frame.text.menu.listener.BoldFont;
+import com.wanli.swing.frame.text.menu.listener.CopyText;
+import com.wanli.swing.frame.text.menu.listener.CutText;
+import com.wanli.swing.frame.text.menu.listener.ItalicText;
+import com.wanli.swing.frame.text.menu.listener.PasteText;
+import com.wanli.swing.frame.text.menu.listener.SelectAll;
+import com.wanli.swing.frame.text.menu.listener.SetTextColor;
+import com.wanli.swing.frame.text.menu.listener.UnderlineText;
 import com.wanli.swing.service.DBService;
 import com.wanli.thread.ListeningSocket;
 import com.wanli.utils.StaticVariable;
+import com.wanli.utils.XmlToJavaBean;
 
+/**
+ * 软件主窗口
+ * @author wanli
+ *
+ */
 public class MainFrame extends ApplicationWindow {
 	private static String APPNAME = "Class For Everyone";	// 当前软件的名称
 	private static String welcome = "欢迎您，";				// 显示欢迎提示
 	private Shell shell;									// 主窗口的shell类
-	private Composite parent;								// 主窗体的Composite类
 	private Action newCreate;								// 新建教室
 	private Action openFile;								// 打开文件
 	private Action saveFile;								// 保存文件
@@ -87,25 +104,23 @@ public class MainFrame extends ApplicationWindow {
 	private Tree tree;										// 显示在线用户列表
 	private Font font;										// 字体
 	private File file;										// 文件
-	private Color color;									// 颜色
-	private StyleRange style, range;						// 风格
 	private TabFolder tabFolder;							// 选项卡
-	private Button first;									// 跳转到第一题
-	private Button previous;								// 上一题
-	private Button next;									// 下一题
-	private Button last;									// 最后一题
+//	private Button first;									// 跳转到第一题
+//	private Button previous;								// 上一题
+//	private Button next;									// 下一题
+//	private Button last;									// 最后一题
 	private String userName;								// 用户名
 	boolean changes;										// 文档是否改变
 	private DBService dbService;							// 创建操作dao的业务
 	private Runtime runtime;								// 获取当前程序的运行时
 	private Process process;								// 用来存储调用的外部进程
-
+	
 	public MainFrame(String userName) {
 		// 部署窗口
 		super(null);
-		//开启一个线程，用来监听客户端的连接
+		// 开启一个线程，用来监听客户端的连接
 		new Thread(new MyServer()).start();
-		//开启一个线程，监听客户端的连接，监听到有客户端连接上就显示客户端的连接情况
+		// 开启一个线程，监听客户端的连接，监听到有客户端连接上就显示客户端的连接情况
 		new Thread(new ListeningSocket()).start();
 		this.userName = userName;// 获取用户名
 		newCreate = new NewCreate();
@@ -127,22 +142,40 @@ public class MainFrame extends ApplicationWindow {
 	}
 
 	public void run() {
+		// 直到窗口关闭方能从 open() 方法返回
 		setBlockOnOpen(true);
+		// 打开窗口
 		open();
+		// 关闭窗口，释放在操作系统中用到的资源
 		Display.getCurrent().dispose();
 	}
+	
+	/**
+	 * 使对话框居中显示
+	 * @param display
+	 * @param shell
+	 */
+	protected void center(Display display, Shell shell) {
+		Rectangle bounds = display.getPrimaryMonitor().getBounds();
+		Rectangle rect = shell.getBounds();
+		int x = bounds.x + (bounds.width - rect.width) / 2;
+		int y = bounds.y + (bounds.height - rect.height) / 2;
+		shell.setLocation(x, y);
+	}
 
+	// 设置窗体外观
 	@Override
 	public Control createContents(Composite parent) {
 		// 设置窗体大小
 		Rectangle bounds = parent.getShell().getDisplay().getPrimaryMonitor().getBounds();
 		int windowWidth = bounds.width;
 		int windowHeight = (int) (bounds.height * 0.98);
-		parent.getShell().setSize(windowWidth, (int) (bounds.height * 0.98));
+		parent.getShell().getDisplay();
+		center(parent.getDisplay(), parent.getShell());
 		// 设置窗体标题
 		parent.getShell().setText(APPNAME);
 		shell = parent.getShell();
-		this.parent = parent;
+		StaticVariable.parent = parent;
 		// 设置主面板
 		Composite mainFrame = new Composite(parent, SWT.NONE);
 		mainFrame.setLayout(null);
@@ -153,7 +186,7 @@ public class MainFrame extends ApplicationWindow {
 		Composite createRoom = new Composite(onlineView, SWT.BORDER);
 		createRoom.setBounds(0, 0, onlineView.getSize().x, (int) (onlineView.getSize().y * 0.04));
 		createRoom.setLayout(new FillLayout());
-		
+		// 创建教室按钮
 		Button button = new Button(createRoom, SWT.NONE);
 		FormData fd_button = new FormData();
 		fd_button.left = new FormAttachment(0);
@@ -162,9 +195,10 @@ public class MainFrame extends ApplicationWindow {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				ServerThread.sendToClient("开启霸屏");
+				ServerThread.sendToAllClient("开启霸屏");
 			}
 		});
+		// 截图按钮
 		Button screenshot = new Button(createRoom, SWT.NONE);
 		screenshot.setText("教学截图");
 		screenshot.setLayoutData(fd_button);
@@ -180,6 +214,15 @@ public class MainFrame extends ApplicationWindow {
 				}
 			}
 		});
+//		Button messBtn = new Button(createRoom, SWT.NONE);
+//		messBtn.setText("提问");
+//		messBtn.setLayoutData(fd_button);
+//		messBtn.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent arg0) {
+//				new AskQuestionTableListener(parent);
+//			}
+//		});
 
 		// 设置显示在线人数面板
 		Composite onlineNum = new Composite(onlineView, SWT.BORDER);
@@ -235,58 +278,121 @@ public class MainFrame extends ApplicationWindow {
 			StaticVariable.text.setLeftMargin(40);
 			StaticVariable.text.setFont(new Font(parent.getDisplay(), "Arial", 20, SWT.NONE));
 			StaticVariable.text.setBounds(0, 0, textComp.getSize().x, questionComp.getSize().y);
+			// 为text添加右键菜单
+			Menu menu = new Menu(shell, SWT.POP_UP);
+			// 添加全选菜单
+			MenuItem selectAllItem = new MenuItem(menu, SWT.PUSH);
+			selectAllItem.setText("全选");
+			selectAllItem.setImage(new Image(parent.getDisplay(), "image/select_all.png"));
+			selectAllItem.addSelectionListener(new SelectAll());
+			// 添加复制菜单
+			MenuItem copyItem = new MenuItem(menu, SWT.PUSH);
+			copyItem.setText("复制");
+			copyItem.setImage(new Image(parent.getDisplay(), "image/copy.png"));
+			copyItem.addSelectionListener(new CopyText());
+			// 添加黏贴菜单
+			MenuItem pasteItem = new MenuItem(menu, SWT.PUSH);
+			pasteItem.setText("黏贴");
+			pasteItem.setImage(new Image(parent.getDisplay(), "image/paste.png"));
+			pasteItem.addSelectionListener(new PasteText());
+			// 添加剪切菜单
+			MenuItem cutItem = new MenuItem(menu, SWT.PUSH);
+			cutItem.setText("剪切");
+			cutItem.setImage(new Image(parent.getDisplay(), "image/cut.png"));
+			cutItem.addSelectionListener(new CutText());
+			// 添加加粗菜单
+			MenuItem boldItem = new MenuItem(menu, SWT.PUSH);
+			boldItem.setText("加粗");
+			boldItem.setImage(new Image(parent.getDisplay(), "image/bold.png"));
+			boldItem.addSelectionListener(new BoldFont());
+			// 添加斜体菜单
+			MenuItem italicItem = new MenuItem(menu, SWT.PUSH);
+			italicItem.setText("斜体");
+			italicItem.setImage(new Image(parent.getDisplay(), "image/italic.png"));
+			italicItem.addSelectionListener(new ItalicText());
+			// 添加下划线菜单
+			MenuItem underlineItem = new MenuItem(menu, SWT.PUSH);
+			underlineItem.setText("下划线");
+			underlineItem.setImage(new Image(parent.getDisplay(), "image/underline.png"));
+			underlineItem.addSelectionListener(new UnderlineText());
+			// 添加设置颜色菜单
+			MenuItem colorItem = new MenuItem(menu, SWT.PUSH);
+			colorItem.setText("设置颜色");
+			colorItem.setImage(new Image(parent.getDisplay(), "image/font_color.png"));
+			colorItem.addSelectionListener(new SetTextColor());
+			StaticVariable.text.setMenu(menu);
 			//为socreTableComp面板设置一个控制布局的对象GridTab1，设置该面板在水平、垂直两个方向全充满
 			GridData gridTab1 = new GridData(GridData.FILL_BOTH);
 			//设置socreTableComp面板垂直占4列
 			gridTab1.horizontalSpan = 4;
 			textComp.setLayoutData(gridTab1);
-			// 定义操作按钮
-			first = new Button(questionComp, SWT.NONE);
-			first.setText("首题");
-			first.setEnabled(false);
-
-			previous = new Button(questionComp, SWT.NONE);
-			previous.setText("上一题");
-			previous.setEnabled(false);
-
-			next = new Button(questionComp, SWT.NONE);
-			next.setText("下一题");
-			next.setEnabled(false);
-
-			last = new Button(questionComp, SWT.NONE);
-			last.setText("末题");
-			last.setEnabled(false);
+			// 定义一个Label控件
+			Label choiceQues = new Label(questionComp, SWT.NONE);
+			choiceQues.setText("选择题目：");
+			// 定义一个下拉框，用于选择题目
+			StaticVariable.questionSelect = new Combo(questionComp, SWT.READ_ONLY);
+			StaticVariable.questionSelect.add("请选择题目");
+			StaticVariable.questionSelect.select(0);
+			GridData selectGrid = new GridData(GridData.FILL_HORIZONTAL);
+			StaticVariable.questionSelect.setLayoutData(selectGrid);
+			StaticVariable.questionSelect.addSelectionListener(new QuestionSelectComboListener());
+//			StaticVariable.refresh = new Button(scoreComp, SWT.NONE);
+//			StaticVariable.refresh.setText("刷新");
+			StaticVariable.scoreChartBtn = new Button(questionComp, SWT.NONE);
+			StaticVariable.scoreChartBtn.setText("图表数据");
+			StaticVariable.scoreChartBtn.setEnabled(false);
+//			first = new Button(questionComp, SWT.NONE);
+//			first.setText("首题");
+//			first.setEnabled(false);
+//
+//			previous = new Button(questionComp, SWT.NONE);
+//			previous.setText("上一题");
+//			previous.setEnabled(false);
+//
+//			next = new Button(questionComp, SWT.NONE);
+//			next.setText("下一题");
+//			next.setEnabled(false);
+//
+//			last = new Button(questionComp, SWT.NONE);
+//			last.setText("末题");
+//			last.setEnabled(false);
 		}
 
 		// 定义第二个选项卡
 		final TabItem score = new TabItem(tabFolder, SWT.NONE);
-		score.setText("成绩");
+		score.setText("答案");
 		{
 			//为该选项卡添加一个面板
-			Composite scoreComp = new Composite(tabFolder, SWT.BORDER);
-			score.setControl(scoreComp);
-			//设置该面板的布局为网格布局，设置成一列
-			scoreComp.setLayout(new GridLayout(2, false));
-			//添加一个面板，用来放置表格
-			Composite scoreTableComp = new Composite(scoreComp, SWT.BORDER);
-			//设置socreTableComp面板为充满式布局
-			scoreTableComp.setLayout(new FillLayout());
-			// 定义表格
-			StaticVariable.scoreTab = new Table(scoreTableComp, SWT.MULTI);
-			// 设置表头可见
-			StaticVariable.scoreTab.setHeaderVisible(true);
-			// 设置网格线可见
-			StaticVariable.scoreTab.setLinesVisible(true);
-			//为socreTableComp面板设置一个控制布局的对象GridTab2，设置该面板在水平、垂直两个方向全充满
-			GridData gridTab2 = new GridData(GridData.FILL_BOTH);
-			//设置socreTableComp面板垂直占两列
-			gridTab2.horizontalSpan = 2;
-			scoreTableComp.setLayoutData(gridTab2);
-			//定义一个刷新表格的按钮
-			StaticVariable.refresh = new Button(scoreComp, SWT.NONE);
-			StaticVariable.refresh.setText("刷新");
-			StaticVariable.scoreChartBtn = new Button(scoreComp, SWT.NONE);
-			StaticVariable.scoreChartBtn.setText("图表数据");
+			Composite answerComp = new Composite(tabFolder, SWT.BORDER);
+			score.setControl(answerComp);
+			answerComp.setLayout(new FillLayout());
+			StaticVariable.answer = new StyledText(answerComp, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.WRAP);
+			StaticVariable.answer.setRightMargin(40);
+			StaticVariable.answer.setLeftMargin(40);
+			StaticVariable.answer.setFont(new Font(parent.getDisplay(), "Arial", 30, SWT.NONE));
+			StaticVariable.answer.setBounds(0, 0, answerComp.getSize().x, answerComp.getSize().y);
+//			//设置该面板的布局为网格布局，设置成一列
+//			scoreComp.setLayout(new GridLayout(2, false));
+//			//添加一个面板，用来放置表格
+//			Composite scoreTableComp = new Composite(scoreComp, SWT.BORDER);
+//			//设置socreTableComp面板为充满式布局
+//			scoreTableComp.setLayout(new FillLayout());
+//			// 定义表格
+//			StaticVariable.scoreTab = new Table(scoreTableComp, SWT.MULTI);
+//			// 设置表头可见
+//			StaticVariable.scoreTab.setHeaderVisible(true);
+//			// 设置网格线可见
+//			StaticVariable.scoreTab.setLinesVisible(true);
+//			//为socreTableComp面板设置一个控制布局的对象GridTab2，设置该面板在水平、垂直两个方向全充满
+//			GridData gridTab2 = new GridData(GridData.FILL_BOTH);
+//			//设置socreTableComp面板垂直占两列
+//			gridTab2.horizontalSpan = 2;
+//			scoreTableComp.setLayoutData(gridTab2);
+//			//定义一个刷新表格的按钮
+//			StaticVariable.refresh = new Button(scoreComp, SWT.NONE);
+//			StaticVariable.refresh.setText("刷新");
+//			StaticVariable.scoreChartBtn = new Button(scoreComp, SWT.NONE);
+//			StaticVariable.scoreChartBtn.setText("图表数据");
 		}
 
 		// 定义第三个选项卡
@@ -324,10 +430,38 @@ public class MainFrame extends ApplicationWindow {
 			StaticVariable.historyCombo.setLayoutData(moduleGrid);
 			//为下拉框添加监听事件
 			StaticVariable.historyCombo.addSelectionListener(new HistoryComboListener(StaticVariable.historyCombo));
-			StaticVariable.historyCharBtn = new Button(historyComp, SWT.NONE);
-			StaticVariable.historyCharBtn.setText("图表数据");
+//			StaticVariable.historyCharBtn = new Button(historyComp, SWT.NONE);
+//			StaticVariable.historyCharBtn.setText("图表数据");
 		}
-
+		
+		// 定义第四个选项卡
+//		final TabItem askQuestion = new TabItem(tabFolder, SWT.NONE);
+		StaticVariable.askQuestion = new TabItem(tabFolder, SWT.NONE);
+		StaticVariable.askQuestion.setText("提问");
+		
+		{
+			//为该选项卡添加一个面板
+			Composite questionComp = new Composite(tabFolder, SWT.BORDER);
+			questionComp.setLayout(new FillLayout());
+			StaticVariable.askQuestion.setControl(questionComp);
+			//设置该面板的布局为网格布局，设置成两列
+			questionComp.setLayout(new FillLayout());
+			//定义一张表格
+			StaticVariable.askQuestions = new Table(questionComp, SWT.MULTI);
+			// 设置表头可见
+			StaticVariable.askQuestions.setHeaderVisible(true);
+			// 设置网格线可见
+			StaticVariable.askQuestions.setLinesVisible(true);
+			// 定义表中的列
+//			TableColumn nameColumn = new TableColumn(StaticVariable.askQuestions, SWT.NONE);
+//			nameColumn.setText("学生");
+//			nameColumn.setWidth(150);
+			TableColumn questionColumn = new TableColumn(StaticVariable.askQuestions, SWT.NONE);
+			questionColumn.setText("问题");
+			questionColumn.setWidth(textView.getSize().x);
+			StaticVariable.askQuestions.addMouseListener(new AskQuestionTableListener(parent));
+		}
+		
 		// 为选项卡添加监听事件
 		tabFolder.addSelectionListener(new TabFordlerListener(tabFolder, StaticVariable.historyCombo));
 		
@@ -335,13 +469,13 @@ public class MainFrame extends ApplicationWindow {
 		statusBar.setBounds(0, (int) (windowHeight * 0.87), windowWidth, 33);
 
 		// 给所有按钮添加监听器
-		first.addSelectionListener(new ButtonDownListener("first"));
-		previous.addSelectionListener(new ButtonDownListener("previous"));
-		next.addSelectionListener(new ButtonDownListener("next"));
-		last.addSelectionListener(new ButtonDownListener("last"));
-		StaticVariable.refresh.addSelectionListener(new ButtonDownListener("refresh"));
+//		first.addSelectionListener(new ButtonDownListener("first"));
+//		previous.addSelectionListener(new ButtonDownListener("previous"));
+//		next.addSelectionListener(new ButtonDownListener("next"));
+//		last.addSelectionListener(new ButtonDownListener("last"));
+//		StaticVariable.refresh.addSelectionListener(new ButtonDownListener("refresh"));
 		StaticVariable.scoreChartBtn.addSelectionListener(new ScoreChartBtnListener(parent));
-		StaticVariable.historyCharBtn.addSelectionListener(new HistoryCharBtnListener(parent));
+//		StaticVariable.historyCharBtn.addSelectionListener(new HistoryCharBtnListener(parent));
 
 		parent.getShell().addControlListener(new ControlListener() {
 
@@ -369,6 +503,62 @@ public class MainFrame extends ApplicationWindow {
 		return mainFrame;
 	}
 
+	// 点击关闭窗口按钮时触发的动作
+	@Override
+	protected void handleShellCloseEvent() { 
+		MessageBox messagebox = new MessageBox(getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);  
+	    messagebox.setMessage("您确定要退出吗?");  
+	    int message = messagebox.open();  
+	    if (message == SWT.YES) {
+	    	if (StaticVariable.correct.size() > 0) {
+				int index = StaticVariable.questionSelect.getSelectionIndex();
+				String question = StaticVariable.questionsMap.get(Integer.toString(index));
+				// 分割字符串，将题目答案等分离
+				String[] strs = question.split(",");
+				if ((strs.length - 4) > 0) {
+					// (strs.length - 4) > 0表示有多个答案
+					StringBuffer answer = new StringBuffer();	// 存储问题的答案
+					StringBuffer corStr = new StringBuffer();	// 存储回答正确的个数，多个答案使用空格分隔
+					StringBuffer errStr = new StringBuffer();	// 存储回答错误的个数，多个答案使用空格分隔
+					StringBuffer unResStr = new StringBuffer();	// 存储未回答的个数，多个答案使用空格分隔
+					// 根据正确的数量和错误的数量计算出未回答的数量
+					for (int i = 0; i < StaticVariable.correct.size(); i++) {
+						int unResponse = StaticVariable.unResponse.get(i).intValue();
+						int correct = StaticVariable.correct.get(i).intValue();
+						int error = StaticVariable.error.get(i).intValue();
+						unResponse = StaticVariable.users.size() - correct - error;
+						StaticVariable.unResponse.set(i, new Integer(unResponse));
+						if (i == 0) {
+							answer.append(strs[i + 3]);
+							corStr.append(correct);
+							errStr.append(error);
+							unResStr.append(unResponse);
+						} else {
+							answer.append(" " + strs[i + 3]);
+							corStr.append(" " + correct);
+							errStr.append(" " + error);
+							unResStr.append(" " + unResponse);
+						}
+					}
+					String countStr = answer.toString() + "," + corStr.toString() + "," + errStr.toString() + "," + unResStr.toString();
+					StaticVariable.answers.put("统计", countStr);
+					System.out.println(countStr);
+				} else {
+					int unResponse = StaticVariable.unResponse.get(0).intValue();
+					int correct = StaticVariable.correct.get(0).intValue();
+					int error = StaticVariable.error.get(0).intValue();
+					unResponse = StaticVariable.users.size() - correct - error;
+					StaticVariable.unResponse.set(0, new Integer(unResponse));
+					String countStr = Integer.toString(correct) + "," + Integer.toString(error) + "," + Integer.toString(unResponse);
+					StaticVariable.answers.put("统计", countStr);
+				}
+				System.out.println(StaticVariable.correct.size());
+				dbService.addRecord(StaticVariable.tableName, StaticVariable.answers, index);
+			}
+	        super.handleShellCloseEvent();  
+	    }
+		
+	}
 	protected MenuManager createMenuManager() {
 		MenuManager menuBar = new MenuManager();
 		MenuManager fileMenu = new MenuManager(" 文件(&F)");
@@ -377,18 +567,22 @@ public class MainFrame extends ApplicationWindow {
 		// 在文件菜单项添加下拉菜单
 		fileMenu.add(newCreate);
 		fileMenu.add(openFile);
+		// 添加分割线
 		fileMenu.add(new Separator());
 		fileMenu.add(saveFile);
 		fileMenu.add(saveAsFile);
+		// 添加分割线
 		fileMenu.add(new Separator());
 		fileMenu.add(exit);
 		// 在编辑菜单下添加下拉菜单
 		editorMenu.add(copyFile);
 		editorMenu.add(pasteFile);
 		editorMenu.add(cutFile);
+		// 添加分割线
 		editorMenu.add(new Separator());
 		editorMenu.add(setFont);
 		editorMenu.add(setColor);
+		// 添加分割线
 		editorMenu.add(new Separator());
 		editorMenu.add(selectAll);
 		editorMenu.add(formate);
@@ -405,6 +599,7 @@ public class MainFrame extends ApplicationWindow {
 		ToolBarManager toolBarManager = new ToolBarManager(style);
 		// gtoolBarManager.add(new NewCreateAction());
 		toolBarManager.add(new OpenFileAction());
+		toolBarManager.add(new CreateXmlFile());
 		toolBarManager.add(new NewCreateAction());
 		// toolBarManager.add(new SaveFileAction());
 		// toolBarManager.add(new Separator());
@@ -427,10 +622,17 @@ public class MainFrame extends ApplicationWindow {
 		public NewCreate() {
 			super("NewCreateAction@Ctrl+N", Action.AS_PUSH_BUTTON);
 			setText(" 新建教室");
+			try {
+				// 载入图像
+				ImageDescriptor icon = ImageDescriptor.createFromURL(new URL("file:image/createclass.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				System.err.println(e.getMessage());
+			}
 		}
 
 		public void run() {
-			new CreateClassListener(parent);
+			new CreateClassListener(StaticVariable.parent);
 			createClass();
 		}
 	}
@@ -454,7 +656,7 @@ public class MainFrame extends ApplicationWindow {
 		}
 
 		public void run() {
-			new CreateClassListener(parent);
+			new CreateClassListener(StaticVariable.parent);
 			createClass();
 		}
 	}
@@ -468,6 +670,13 @@ public class MainFrame extends ApplicationWindow {
 		public OpenFile() {
 			super("OpenFileAction@Ctrl+O", Action.AS_PUSH_BUTTON);
 			setText(" 打开");
+			try {
+				// 载入图像
+				ImageDescriptor icon = ImageDescriptor.createFromURL(new URL("file:image/folder.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				System.err.println(e.getMessage());
+			}
 		}
 
 		public void run() {
@@ -501,6 +710,29 @@ public class MainFrame extends ApplicationWindow {
 				OpenTextFile();
 		}
 	}
+	
+	/**
+	 * 课前备题，工具栏
+	 * @author wanli
+	 *
+	 */
+	class CreateXmlFile extends Action {
+		public CreateXmlFile() {
+			super("OpenFileAction@Ctrl+Shift+C", Action.AS_PUSH_BUTTON);
+			setText("备题");
+			try {
+				// 载入图像
+				ImageDescriptor icon = ImageDescriptor.createFromURL(new URL("file:image/before_class.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				System.err.println(e.getMessage());
+			}
+		}
+		
+		public void run() {
+			new PrepareLessons(StaticVariable.parent);
+		}
+	}
 
 	/**
 	 * 保存文件
@@ -511,8 +743,14 @@ public class MainFrame extends ApplicationWindow {
 		public SaveFileAction() {
 			super("SaveFileAction@Ctrl+S", Action.AS_PUSH_BUTTON);
 			setText(" 保存");
+			try {
+				// 载入图像
+				ImageDescriptor icon = ImageDescriptor.createFromURL(new URL("file:image/save.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
-
 		public void run() {
 			saveTextFile();
 		}
@@ -526,6 +764,14 @@ public class MainFrame extends ApplicationWindow {
 	class SaveAsFileAction extends Action {
 		public SaveAsFileAction() {
 			super(" 另存为@Alt+A", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/saveas.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -541,6 +787,14 @@ public class MainFrame extends ApplicationWindow {
 	class ExitAction extends Action {
 		public ExitAction() {
 			super(" 退出@Ctrl+E", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/close.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -557,6 +811,14 @@ public class MainFrame extends ApplicationWindow {
 		public CopyFileAction() {
 			super("CopyFileAction@Ctrl+C", Action.AS_PUSH_BUTTON);
 			setText(" 复制");
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/copy.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -573,6 +835,14 @@ public class MainFrame extends ApplicationWindow {
 		public PasteFileAction() {
 			super("PasteFileAction@Ctrl+V", Action.AS_PUSH_BUTTON);
 			setText(" 粘贴");
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/paste.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -589,6 +859,14 @@ public class MainFrame extends ApplicationWindow {
 		public CutFileAction() {
 			super("CutFileAction @Ctrl+X", Action.AS_PUSH_BUTTON);
 			setText(" 剪切");
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/cut.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -604,19 +882,27 @@ public class MainFrame extends ApplicationWindow {
 	class SetFontAction extends Action {
 		public SetFontAction() {
 			super(" 设置字体@Alt+F", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/font.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
 			FontDialog fontDialog = new FontDialog(getShell());
 			fontDialog.setFontList((StaticVariable.text.getFont()).getFontData());
 			FontData fontData = fontDialog.open();
-			if (fontData != null) {
-				if (font != null) {
-					font.dispose();
-				}
-				font = new Font(getShell().getDisplay(), fontData);
-				StaticVariable.text.setFont(font);
-			}
+//			if (fontData != null) {
+//				if (font != null) {
+//					font.dispose();
+//				}
+//			}
+			font = new Font(getShell().getDisplay(), fontData);
+			StaticVariable.text.setFont(font);
 		}
 	}
 
@@ -628,6 +914,14 @@ public class MainFrame extends ApplicationWindow {
 	class SetColorAction extends Action {
 		public SetColorAction() {
 			super(" 设置颜色@Alt+C", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/font_color.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -637,27 +931,27 @@ public class MainFrame extends ApplicationWindow {
 			RGB rgb = dlg.open();
 			if (rgb != null) {
 				// 定义 color 对象
-				color = new Color(getShell().getDisplay(), rgb);
+				StaticVariable.color = new Color(getShell().getDisplay(), rgb);
 				// 定义 point 对象，获取选择范围。
 				Point point = StaticVariable.text.getSelectionRange();
 				for (int i = point.x; i < point.x + point.y; i++) {
 					// 获得选中的字体样式和范围
-					range = StaticVariable.text.getStyleRangeAtOffset(i);
+					StaticVariable.range = StaticVariable.text.getStyleRangeAtOffset(i);
 					// 如果字体设置了其他样式( 如加粗、斜体、加下划线)
-					if (range != null) {
+					if (StaticVariable.range != null) {
 						/**
 						 * 设置一个与原来 StyleRange 的值相同的 StyleRange
 						 */
-						style = (StyleRange) range.clone();
-						style.start = i;
-						style.length = 1;
+						StaticVariable.style = (StyleRange) StaticVariable.range.clone();
+						StaticVariable.style.start = i;
+						StaticVariable.style.length = 1;
 						// 设置前景颜色
-						style.foreground = color;
+						StaticVariable.style.foreground = StaticVariable.color;
 					} else {
 
-						style = new StyleRange(i, 1, color, null, SWT.NORMAL);
+						StaticVariable.style = new StyleRange(i, 1, StaticVariable.color, null, SWT.NORMAL);
 					}
-					StaticVariable.text.setStyleRange(style);
+					StaticVariable.text.setStyleRange(StaticVariable.style);
 				}
 			}
 		}
@@ -671,6 +965,14 @@ public class MainFrame extends ApplicationWindow {
 	class SelectAllAction extends Action {
 		public SelectAllAction() {
 			super(" 全选@Ctrl+A", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/select_all.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void run() {
@@ -710,6 +1012,11 @@ public class MainFrame extends ApplicationWindow {
 		}
 	}
 
+	/**
+	 * 加粗
+	 * @author wanli
+	 *
+	 */
 	class BlodAction extends Action {
 		public BlodAction() {
 			setText(" 加粗");
@@ -720,19 +1027,24 @@ public class MainFrame extends ApplicationWindow {
 			for (int i = point.x; i < point.x + point.y; i++) {
 				StyleRange range = StaticVariable.text.getStyleRangeAtOffset(i);
 				if (range != null) {
-					style = (StyleRange) range.clone();
-					style.start = i;
-					style.length = 1;
+					StaticVariable.style = (StyleRange) range.clone();
+					StaticVariable.style.start = i;
+					StaticVariable.style.length = 1;
 				} else {
-					style = new StyleRange(i, 1, null, null, SWT.NORMAL);
+					StaticVariable.style = new StyleRange(i, 1, null, null, SWT.NORMAL);
 				}
 				// 加粗字体
-				style.fontStyle ^= SWT.BOLD;
-				StaticVariable.text.setStyleRange(style);
+				StaticVariable.style.fontStyle ^= SWT.BOLD;
+				StaticVariable.text.setStyleRange(StaticVariable.style);
 			}
 		}
 	}
 
+	/**
+	 * 斜体
+	 * @author wanli
+	 *
+	 */
 	class ItalicAction extends Action {
 		public ItalicAction() {
 			setText(" 斜体");
@@ -741,21 +1053,26 @@ public class MainFrame extends ApplicationWindow {
 		public void run() {
 			Point point = StaticVariable.text.getSelectionRange();
 			for (int i = point.x; i < point.x + point.y; i++) {
-				range = StaticVariable.text.getStyleRangeAtOffset(i);
-				if (range != null) {
-					style = (StyleRange) range.clone();
-					style.start = i;
-					style.length = 1;
+				StaticVariable.range = StaticVariable.text.getStyleRangeAtOffset(i);
+				if (StaticVariable.range != null) {
+					StaticVariable.style = (StyleRange) StaticVariable.range.clone();
+					StaticVariable.style.start = i;
+					StaticVariable.style.length = 1;
 				} else {
-					style = new StyleRange(i, 1, null, null, SWT.NORMAL);
+					StaticVariable.style = new StyleRange(i, 1, null, null, SWT.NORMAL);
 				}
 				// 设置为斜体
-				style.fontStyle ^= SWT.ITALIC;
-				StaticVariable.text.setStyleRange(style);
+				StaticVariable.style.fontStyle ^= SWT.ITALIC;
+				StaticVariable.text.setStyleRange(StaticVariable.style);
 			}
 		}
 	}
 
+	/**
+	 * 下划线
+	 * @author wanli
+	 *
+	 */
 	class UnderlineAction extends Action {
 		public UnderlineAction() {
 			setText(" 下划线");
@@ -764,17 +1081,17 @@ public class MainFrame extends ApplicationWindow {
 		public void run() {
 			Point point = StaticVariable.text.getSelectionRange();
 			for (int i = point.x; i < point.x + point.y; i++) {
-				range = StaticVariable.text.getStyleRangeAtOffset(i);
-				if (range != null) {
-					style = (StyleRange) range.clone();
-					style.start = i;
-					style.length = 1;
+				StaticVariable.range = StaticVariable.text.getStyleRangeAtOffset(i);
+				if (StaticVariable.range != null) {
+					StaticVariable.style = (StyleRange) StaticVariable.range.clone();
+					StaticVariable.style.start = i;
+					StaticVariable.style.length = 1;
 				} else {
-					style = new StyleRange(i, 1, null, null, SWT.NORMAL);
+					StaticVariable.style = new StyleRange(i, 1, null, null, SWT.NORMAL);
 				}
 				// 设置下划线
-				style.underline = !style.underline;
-				StaticVariable.text.setStyleRange(style);
+				StaticVariable.style.underline = !StaticVariable.style.underline;
+				StaticVariable.text.setStyleRange(StaticVariable.style);
 			}
 		}
 	}
@@ -804,7 +1121,7 @@ public class MainFrame extends ApplicationWindow {
 		// 定义对话框，类型为打开型
 		FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
 		// 设置对话框打开的限定类型
-		dialog.setFilterExtensions(new String[] { " *.txt", "*.doc", "*.docx"});
+		dialog.setFilterExtensions(new String[] { "*.xml"});
 		// 打开对话框，并返回打开文件的路径
 		String openFile = dialog.open();
 		if (openFile == null) {
@@ -812,72 +1129,46 @@ public class MainFrame extends ApplicationWindow {
 		}
 		// 打开指定的文件
 		file = new File(openFile);
-		String fileExtension = file.getName().substring(file.getName().indexOf("."));
-		try {
-			//读取扩展名为.doc的word文档
-			HWPFDocument doc = null;
-			//读取扩展名为.docx的word文档
-			XWPFDocument docx = null;
-			XWPFWordExtractor extractor = null;
-			//读取扩展名为.txt的文档
-			StringBuffer sb = null;
-			String fileText = null;
-			BufferedReader reader = null;
-			FileInputStream in = null;
-			if (fileExtension.equals(".doc")) {
-				in = new FileInputStream(file);
-				doc = new HWPFDocument(in);
-				fileText = doc.getDocumentText();
-				StaticVariable.questions = fileText.split(new String("#\\^"));
-				StaticVariable.text.setText(StaticVariable.questions[1]);
-			} else if (fileExtension.equals(".docx")) {
-				in = new FileInputStream(file);
-				docx = new XWPFDocument(in);
-				extractor = new XWPFWordExtractor(docx);
-				fileText = extractor.getText();
-				StaticVariable.questions = fileText.split(new String("#\\^"));
-				StaticVariable.text.setText(StaticVariable.questions[1]);
-			}
-			else {
-				// 读取文件
-				FileReader fileReader = new FileReader(file);
-				// 把字符流的字符读入缓冲区
-				reader = new BufferedReader(fileReader);
-				sb = new StringBuffer();
-				String line = null;
-				while ((line = reader.readLine()) != null) {
-					// 通过 append() 方法实现将字符串添加到字符缓冲区。
-					sb.append(line);
-					sb.append("\r\n");
-				}
-				// 将读取的文件用字符串"#^"分开，因为'^'是转义字符，所以前面要加\\
-				StaticVariable.questions = sb.toString().split(new String("#\\^"));	
-				StaticVariable.text.setText(StaticVariable.questions[1]);
-			}
-			System.out.println(StaticVariable.questions.length);
-			int num = StaticVariable.questions.length - 1;
-			String fileName = file.getName();
-			shell.setText(APPNAME + "-" + file);
-			StaticVariable.tableName = fileName.substring(0, fileName.indexOf("."));
-			dbService.createTable(num, StaticVariable.tableName);
-			//有文件，启用按钮
-			first.setEnabled(true);
-			previous.setEnabled(true);
-			next.setEnabled(true);
-			last.setEnabled(true);
-			if (reader != null) {
-				reader.close();				
-			}
-			if (in != null) {
-				in.close();
-			}
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		new XmlToJavaBean(file);
+		shell.setText(APPNAME + "-" + file);
+		String fileName = file.getName();
+		StaticVariable.tableName = fileName.substring(0, fileName.indexOf("."));
+		dbService.createTable(StaticVariable.questionsMap.size(), StaticVariable.tableName);
+//		try {
+//			
+//			// 读取文件
+//			FileReader fileReader = new FileReader(file);
+//			// 把字符流的字符读入缓冲区
+//			BufferedReader reader = new BufferedReader(fileReader);
+//			StringBuffer sb = new StringBuffer();
+//			String line = null;
+//			while ((line = reader.readLine()) != null) {
+//				// 通过 append() 方法实现将字符串添加到字符缓冲区。
+//				sb.append(line);
+//				sb.append("\r\n");
+//			}
+//			
+//			int num = StaticVariable.questions.length - 1;
+//			String fileName = file.getName();
+//			shell.setText(APPNAME + "-" + file);
+//			StaticVariable.tableName = fileName.substring(0, fileName.indexOf("."));
+//			dbService.createTable(num, StaticVariable.tableName);
+//			
+//			//有文件，启用按钮
+////			first.setEnabled(true);
+////			previous.setEnabled(true);
+////			next.setEnabled(true);
+////			last.setEnabled(true);
+//			if (reader != null) {
+//				reader.close();				
+//			}
+//			return true;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		return false;
 	}
 
