@@ -18,12 +18,16 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.aliyuncs.exceptions.ClientException;
 import com.wanli.swing.Mmmm;
 import com.wanli.swing.entities.ChoiceQuestion;
 import com.wanli.swing.entities.OnlineUser;
 import com.wanli.swing.frame.MessagePOP_UP;
 import com.wanli.swing.service.DBService;
 import com.wanli.swing.service.DBServiceUser;
+import com.wanli.utils.MailUtils;
+import com.wanli.utils.Randomutil;
+import com.wanli.utils.SmsUtils;
 import com.wanli.utils.StaticVariable;
 
 /**
@@ -47,6 +51,8 @@ public class ServerThread implements Runnable {
 	private DBServiceUser dbServiceUser;
 	// 操作成绩表数据库
 	private DBService dbService;
+	// 生成的6位验证码
+	private String randomNum;
 	
 	public ServerThread(Socket s) throws IOException {
 		this.s = s;
@@ -99,7 +105,6 @@ public class ServerThread implements Runnable {
 //						System.out.println("登录了。。。。。");
 						StaticVariable.users.get(ipAddress).setInetAddress(s.getInetAddress().toString().substring(1));
 						StaticVariable.users.get(ipAddress).setUsername(info[1]);
-System.out.println("....2");
 					} else {
 						// 登录失败
 						sendToClient("2-false");
@@ -120,7 +125,8 @@ System.out.println("....2");
 								StaticVariable.answers.put(info[1], "");
 								StaticVariable.answers.replace(info[1], info[2]);
 								int index = StaticVariable.questionSelect.getSelectionIndex();
-								String[] strs = StaticVariable.questionsMap.get(Integer.toString(index)).split(",");						
+//								String[] strs = StaticVariable.questionsMap.get(Integer.toString(index)).split(",");
+								String[] strs = StaticVariable.questionsList.get(index - 1).split(",");
 								// answers.length > 1 表示有多个答案
 								if (answers.length > 1) {
 									// 多个答案用空隔分开，过滤掉多余的空隔
@@ -194,8 +200,21 @@ System.out.println("....2");
 					// 若密码为null，则表示是查询手机号或邮箱是否已经注册过
 					if (info[2].equals("null")) {
 						if (dbServiceUser.getByUsername(info[1])) {
-							// 注册过给客户端发送成功提示
-							sendToClient("5");
+							// 如果找到该用户，说明已经有注册过，接着发送验证码
+							boolean result = info[1].matches("[0-9]+");
+							randomNum = Randomutil.getRandom();
+							if (result) {
+								try {
+									SmsUtils.sendSms(info[1], randomNum);
+								} catch (ClientException e) {
+									System.out.println("短信发送失败");
+									e.printStackTrace();
+								}
+							} else {
+								MailUtils.sendMail(info[1], randomNum);
+							}
+//							// 注册过给客户端发送提示信息，并把验证码发送给客户端
+//							sendToClient("5," + randomNum);
 						} else {
 							// 未注册过给客户端发送失败提示
 							sendToClient("5-false");
@@ -203,7 +222,7 @@ System.out.println("....2");
 					} else {
 						// 若密码不是null，则表示是修改密码
 						dbServiceUser.updatePassword(info[1], info[2]);
-						sendToClient("5");
+						sendToClient("5-true");
 					}
 					break;
 				// 向客户端发送教室信息
@@ -225,7 +244,16 @@ System.out.println("....2");
 				case "7":
 					int index = StaticVariable.questionSelect.getSelectionIndex();
 					if (index > 0) {
-						sendToClient(StaticVariable.questionsMap.get(Integer.toString(index)));
+//						sendToClient(StaticVariable.questionsMap.get(Integer.toString(index)));
+						sendToClient(StaticVariable.questionsList.get(index - 1));
+					}
+					break;
+				// 校验客户端发送过来的验证码是否正确
+				case "8":
+					if (info[1].equals(randomNum)) {
+						sendToClient("8");
+					} else {
+						sendToClient("8-false");
 					}
 					break;
 			}
@@ -294,7 +322,6 @@ System.out.println("....2");
 	 * @param msg
 	 */
 	public void sendToClient(String msg) {
-		System.out.println(msg);
         PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(s.getOutputStream());

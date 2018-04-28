@@ -47,11 +47,12 @@ public class QuestionSelectComboListener implements SelectionListener {
 		// StaticVariable.correct.size() > 0表示有学生回答问题，将回答的答案存入数据库
 		if (StaticVariable.correct.size() > 0) {
 			// 上一次选择的题目
-			String question = StaticVariable.questionsMap.get(Integer.toString(index));
+//			String question = StaticVariable.questionsMap.get(Integer.toString(index));
+			String question = StaticVariable.questionsList.get(index - 1);
 			// 分割字符串，将题目答案等分离
 			String[] strs = question.split(",");
-			if ((strs.length - 4) > 0) {
-				// (strs.length - 4) > 0表示有多个答案
+			if ((strs.length - 3) > 0) {
+				// (strs.length - 3) > 0表示有多个答案
 				StringBuffer answer = new StringBuffer();	// 存储问题的答案
 				StringBuffer corStr = new StringBuffer();	// 存储回答正确的个数，多个答案使用空格分隔
 				StringBuffer errStr = new StringBuffer();	// 存储回答错误的个数，多个答案使用空格分隔
@@ -64,12 +65,12 @@ public class QuestionSelectComboListener implements SelectionListener {
 					unResponse = StaticVariable.users.size() - correct - error;
 					StaticVariable.unResponse.set(i, new Integer(unResponse));
 					if (i == 0) {
-						answer.append(strs[i + 3]);
+						answer.append(strs[i + 2]);
 						corStr.append(correct);
 						errStr.append(error);
 						unResStr.append(unResponse);
 					} else {
-						answer.append(" " + strs[i + 3]);
+						answer.append(" " + strs[i + 2]);
 						corStr.append(" " + correct);
 						errStr.append(" " + error);
 						unResStr.append(" " + unResponse);
@@ -108,13 +109,14 @@ public class QuestionSelectComboListener implements SelectionListener {
 				// 清空StringBuffer
 				showQues.setLength(0);
 				// 获取题目
-				question = StaticVariable.questionsMap.get(Integer.toString(index));
+//				question = StaticVariable.questionsMap.get(Integer.toString(index));
+				question = StaticVariable.questionsList.get(index - 1);
 				// 分割题目
 				strs = question.split(",");
 				// 重组题目
 				showQues.append("选择题:\n\n");
-				showQues.append(strs[2]);
-				for (int i = 4; i < strs.length; i++) {
+				showQues.append(strs[1]);
+				for (int i = 3; i < strs.length; i++) {
 					showQues.append("\n" + (char)option + "." + strs[i]);
 					option++;
 				}
@@ -131,10 +133,11 @@ public class QuestionSelectComboListener implements SelectionListener {
 				StaticVariable.error.clear();
 				StaticVariable.unResponse.clear();
 				showQues.setLength(0);
-				question = StaticVariable.questionsMap.get(Integer.toString(index));
+//				question = StaticVariable.questionsMap.get(Integer.toString(index));
+				question = StaticVariable.questionsList.get(index - 1);
 				strs = question.split(",");
 				showQues.append("是非题:\n\n");
-				showQues.append(strs[2]);
+				showQues.append(strs[1]);
 				StaticVariable.text.setText(showQues.toString());
 				StaticVariable.text.setStyleRange(style);
 				break;
@@ -144,16 +147,18 @@ public class QuestionSelectComboListener implements SelectionListener {
 				StaticVariable.error.clear();
 				StaticVariable.unResponse.clear();
 				showQues.setLength(0);
-				question = StaticVariable.questionsMap.get(Integer.toString(index));
+//				question = StaticVariable.questionsMap.get(Integer.toString(index));
+				question = StaticVariable.questionsList.get(index - 1);
 				strs = question.split(",");
 				showQues.append("填空题:\n\n");
-				showQues.append(strs[2]);
+				showQues.append(strs[1]);
 				StaticVariable.text.setText(showQues.toString());
 				StaticVariable.text.setStyleRange(style);
 				break;
 			}
 		} else {
 			StaticVariable.scoreChartBtn.setEnabled(false);
+			StaticVariable.text.setText("");
 		}
 	}
 

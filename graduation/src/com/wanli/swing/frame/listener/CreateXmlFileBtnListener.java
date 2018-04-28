@@ -15,10 +15,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 import com.wanli.swing.entities.Question;
 import com.wanli.utils.AddToQuestionList;
+import com.wanli.utils.JavaBeanToXml;
 import com.wanli.utils.StaticVariable;
 
 /**
@@ -43,8 +45,13 @@ public class CreateXmlFileBtnListener implements SelectionListener {
 
 	@Override
 	public void widgetSelected(SelectionEvent arg0) {
-		// 判断最后一题的题型
-		if (StaticVariable.questionType.equals("choice")) {
+		if (StaticVariable.questionType == null) {
+			MessageBox messageBox = new MessageBox(shell, SWT.YES);
+			messageBox.setText("警告");
+			messageBox.setMessage("还没有添加任何的题目，无法创建！");
+			messageBox.open();
+		} else if (StaticVariable.questionType.equals("choice")) {
+			// 判断最后一题的题型
 			// 判断是否有空行没有填写，是则询问是否放弃本题
 			create = AddToQuestionList.judgeTextEmpty(StaticVariable.choiceAllText);
 			if (create.equals("create")) {
@@ -61,48 +68,39 @@ public class CreateXmlFileBtnListener implements SelectionListener {
 				AddToQuestionList.fillBlanks();
 			}
 		}
-		if (create.equals("create") || create.equals("true")) {
-			questions = new Question();
-			questions.setChoiceList(StaticVariable.choiceList);
-			questions.setTrueOrFalseList(StaticVariable.trueOrFalseList);
-			questions.setFillBlanksList(StaticVariable.fillblanksList);
-			// 生成映射字符串
-			String str = beanToXml(questions, Question.class);
-			// 写入到xml文件中
-			boolean save = saveXmlFile(str);
-			StaticVariable.choiceList.clear();
-			StaticVariable.trueOrFalseList.clear();
-			StaticVariable.fillblanksList.clear();
-			StaticVariable.creQuesIndex = 0;
-			if (save) {
-				shell.dispose();				
-			}
+		if (create != null) {
+			if (create.equals("create") || create.equals("true")) {
+				if (StaticVariable.choiceList.size() > 0 || StaticVariable.trueOrFalseList.size() > 0 || StaticVariable.fillblanksList.size() > 0) {
+					questions = new Question();
+					questions.setChoiceList(StaticVariable.choiceList);
+					questions.setTrueOrFalseList(StaticVariable.trueOrFalseList);
+					questions.setFillBlanksList(StaticVariable.fillblanksList);
+					// 生成映射字符串
+					String str = JavaBeanToXml.beanToXml(questions, Question.class);
+					// 写入到xml文件中
+					boolean save = saveXmlFile(str);
+					StaticVariable.choiceList.clear();
+					StaticVariable.trueOrFalseList.clear();
+					StaticVariable.fillblanksList.clear();
+					StaticVariable.creQuesIndex = 0;
+					if (save) {
+						shell.dispose();				
+					}
+				} else {
+					MessageBox messageBox = new MessageBox(shell, SWT.YES);
+					messageBox.setText("警告");
+					messageBox.setMessage("还没有添加任何的题目，无法创建！");
+					messageBox.open();
+				}	
+			}			
 		}
 	}
-	
-	/**
-     * java对象转换为xml文件
-     * @param xmlPath: xml文件路径
-     * @param load:    java对象.Class
-     * @return:        xml文件的String
-     * @throws JAXBException    
-     */
-    private String beanToXml(Object obj,Class<?> load) {
-        JAXBContext context = null;
-        StringWriter writer = null;
-		try {
-			context = JAXBContext.newInstance(load);
-			Marshaller marshaller = context.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.setProperty(Marshaller.JAXB_ENCODING, "GBK");
-			writer = new StringWriter();
-			marshaller.marshal(obj,writer);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
-        return writer.toString();
-    }
 
+    /**
+     * 保存成xml文件
+     * @param str
+     * @return
+     */
     private boolean saveXmlFile(String str) {
     	boolean save = false;
     	// 保存文件对话框

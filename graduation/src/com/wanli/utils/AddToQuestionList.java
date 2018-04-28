@@ -20,6 +20,7 @@ import com.wanli.swing.entities.TrueOrFalse;
  */
 public class AddToQuestionList {
 
+	// 添加选择题
 	public static void addToChoiceList(List<String> optionKeys, boolean hasEmpty) {
 		// 判断是否有输入框没有填写
 		hasEmpty = judgeTextEmpty(StaticVariable.choiceAllText, hasEmpty);
@@ -61,6 +62,7 @@ public class AddToQuestionList {
 		// }
 	}
 	
+	// 添加是非题
 	public static void addToTrueOrFalseList(boolean hasEmpty) {
 		hasEmpty = judgeTextEmpty(StaticVariable.trueOrFalseAllText, hasEmpty);
 		if (!hasEmpty) {
@@ -83,6 +85,7 @@ public class AddToQuestionList {
 //		}
 	}
 	
+	// 添加填空题
 	public static void addToFillBlanks(boolean hasEmpty) {
 		hasEmpty = judgeTextEmpty(StaticVariable.fillblanksAllText, hasEmpty);
 		if (!hasEmpty) {

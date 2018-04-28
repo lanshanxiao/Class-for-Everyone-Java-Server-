@@ -4,11 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.wb.swt.SWTResourceManager;
 import org.swtchart.Chart;
 import org.swtchart.IBarSeries;
 import org.swtchart.ISeries.SeriesType;
@@ -31,7 +38,9 @@ public class HistoryChartTableUtil extends Dialog {
 	
 	public HistoryChartTableUtil(Shell parent, int index) {
 		super(parent, SWT.NONE);
-		inti(StaticVariable.statisticalData.get(index));
+		if (StaticVariable.statisticalData.size() > 0) {
+			inti(StaticVariable.statisticalData.get(index));			
+		}
 	}
 	
 	public Object open() {
@@ -49,6 +58,7 @@ public class HistoryChartTableUtil extends Dialog {
 	protected void createContents() {
 		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
         shell.setText("图表");
+        shell.setImage(SWTResourceManager.getImage("image/quesCount.png"));
         shell.setSize(800, 300);
         shell.setLayout(new FillLayout());
         createChart(shell);
@@ -68,11 +78,13 @@ public class HistoryChartTableUtil extends Dialog {
         chart.getAxisSet().getXAxis(0).setCategorySeries(
                 new String[] { "正确", "错误", "未回答"});
 
-        for (int i = 0; i < cagetorySeries.length; i++) {
-        	IBarSeries barSeries = (IBarSeries) chart.getSeriesSet().createSeries(
-                    SeriesType.BAR, cagetorySeries[i]);
-        	
-        	barSeries.setYSeries(ySeries.get(i));
+        if (cagetorySeries != null) {
+        	for (int i = 0; i < cagetorySeries.length; i++) {
+        		IBarSeries barSeries = (IBarSeries) chart.getSeriesSet().createSeries(
+        				SeriesType.BAR, cagetorySeries[i]);
+        		
+        		barSeries.setYSeries(ySeries.get(i));
+        	}        	
         }
 //        // create bar series
 //        IBarSeries barSeries1 = (IBarSeries) chart.getSeriesSet().createSeries(
@@ -90,9 +102,14 @@ public class HistoryChartTableUtil extends Dialog {
 	}
 	
 	protected void inti(String str) {
+		String[] strs;
 		// 字符串存储的格式：{答案1 答案2 答案3...,正确1  正确2 正确3...,错误1 错误2 错误3...,未回答1 未回答2 未回答3...}
 		// 将传过来的字符串使用“,”号分割
-		String[] strs = str.split(",");
+		if (str != null && str != "") {
+			strs = str.split(",");			
+		} else {
+			return;
+		}
 		// 判断是否是多个答案
 		if (strs[0].split(" ").length > 1) {
 			// 根据答案的多少初始化数组

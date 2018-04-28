@@ -50,22 +50,24 @@ public class TabFordlerListener extends SelectionAdapter {
 			int index = StaticVariable.questionSelect.getSelectionIndex();
 			if (index > 0) {
 				showAnswer.append("答案:");
-				String question = StaticVariable.questionsMap.get(Integer.toString(index));
+//				String question = StaticVariable.questionsMap.get(Integer.toString(index));
+				// question格式：题目类型，题目，答案1，答案2... 
+				String question = StaticVariable.questionsList.get(index - 1);
 				String[] strs = question.split(",");
-				if (strs[1].equals("fill_in_the_blanks")) {
+				if (strs[0].equals("fill_in_the_blanks")) {
 					// 判断是否有多个答案
-					if ((strs.length - 4) > 0) {
+					if ((strs.length - 3) > 0) {
 						// 有多个答案
-						for (int i = 3; i < strs.length; i++) {
+						for (int i = 2; i < strs.length; i++) {
 							showAnswer.append("\n\t\t" + strs[i]);
 						}
 					} else {
 						// 只有一个答案
-						showAnswer.append("\n\t\t" + strs[3]);
+						showAnswer.append("\n\t\t" + strs[2]);
 					}					
 				} else {
 					// 只有一个答案
-					showAnswer.append("\n\t\t" + strs[3]);
+					showAnswer.append("\n\t\t" + strs[2]);
 				}
 				StaticVariable.answer.setText(showAnswer.toString());
 				// 设置样式

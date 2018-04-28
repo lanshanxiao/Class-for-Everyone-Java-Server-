@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.wanli.classforereryone.server.MyServer;
 import com.wanli.classforereryone.server.ServerThread;
@@ -75,6 +76,7 @@ import com.wanli.swing.frame.text.menu.listener.SelectAll;
 import com.wanli.swing.frame.text.menu.listener.SetTextColor;
 import com.wanli.swing.frame.text.menu.listener.UnderlineText;
 import com.wanli.swing.service.DBService;
+import com.wanli.swing.service.DBServiceUser;
 import com.wanli.thread.ListeningSocket;
 import com.wanli.utils.StaticVariable;
 import com.wanli.utils.XmlToJavaBean;
@@ -90,8 +92,9 @@ public class MainFrame extends ApplicationWindow {
 	private Shell shell;									// 主窗口的shell类
 	private Action newCreate;								// 新建教室
 	private Action openFile;								// 打开文件
-	private Action saveFile;								// 保存文件
-	private Action saveAsFile;								// 另存为
+//	private Action saveFile;								// 保存文件
+//	private Action saveAsFile;								// 另存为
+	private Action unsubscribe;								// 注销
 	private Action exit;									// 退出程序
 	private Action copyFile;								// 复制
 	private Action pasteFile;								// 粘贴
@@ -114,6 +117,8 @@ public class MainFrame extends ApplicationWindow {
 	private DBService dbService;							// 创建操作dao的业务
 	private Runtime runtime;								// 获取当前程序的运行时
 	private Process process;								// 用来存储调用的外部进程
+	private DBServiceUser serviceUser;	
+	private String nickname;
 	
 	public MainFrame(String userName) {
 		// 部署窗口
@@ -125,8 +130,9 @@ public class MainFrame extends ApplicationWindow {
 		this.userName = userName;// 获取用户名
 		newCreate = new NewCreate();
 		openFile = new OpenFile();
-		saveFile = new SaveFileAction();
-		saveAsFile = new SaveAsFileAction();
+//		saveFile = new SaveFileAction();
+//		saveAsFile = new SaveAsFileAction();
+		unsubscribe = new UnsubscribeAction();
 		exit = new ExitAction();
 		copyFile = new CopyFileAction();
 		pasteFile = new PasteFileAction();
@@ -139,6 +145,8 @@ public class MainFrame extends ApplicationWindow {
 		dbService = new DBService();
 		addMenuBar();// 添加菜单栏
 		addToolBar(SWT.FLAT);// 添加工具栏
+		serviceUser = new DBServiceUser();
+		nickname = serviceUser.getNicknameByPhoneOrEmail(userName);
 	}
 
 	public void run() {
@@ -146,8 +154,10 @@ public class MainFrame extends ApplicationWindow {
 		setBlockOnOpen(true);
 		// 打开窗口
 		open();
-		// 关闭窗口，释放在操作系统中用到的资源
-		Display.getCurrent().dispose();
+		if (!Display.getCurrent().isDisposed()) {
+			// 关闭窗口，释放在操作系统中用到的资源
+			Display.getCurrent().dispose();			
+		}
 	}
 	
 	/**
@@ -174,6 +184,7 @@ public class MainFrame extends ApplicationWindow {
 		center(parent.getDisplay(), parent.getShell());
 		// 设置窗体标题
 		parent.getShell().setText(APPNAME);
+		parent.getShell().setImage(SWTResourceManager.getImage("image/1.jpg"));
 		shell = parent.getShell();
 		StaticVariable.parent = parent;
 		// 设置主面板
@@ -231,12 +242,12 @@ public class MainFrame extends ApplicationWindow {
 
 		// 显示登录信息
 		Label welcome = new Label(onlineNum, SWT.NONE);
-		welcome.setBounds(0, 0, 268, 32);
-		welcome.setText(MainFrame.welcome + this.userName);
+		welcome.setBounds(0, 0, 300, 32);
+		welcome.setText(MainFrame.welcome + this.nickname);
 
 		// 显示在线人数
 		StaticVariable.onlining = new Label(onlineNum, SWT.NONE);
-		StaticVariable.onlining.setBounds(269, 0, 303, 32);
+		StaticVariable.onlining.setBounds(300, 0, 300, 32);
 		StaticVariable.onlining.setText(StaticVariable.onlineNumsStr + StaticVariable.onlineNumsInt);
 
 		// 设置显示在线用户列表面板
@@ -512,7 +523,8 @@ public class MainFrame extends ApplicationWindow {
 	    if (message == SWT.YES) {
 	    	if (StaticVariable.correct.size() > 0) {
 				int index = StaticVariable.questionSelect.getSelectionIndex();
-				String question = StaticVariable.questionsMap.get(Integer.toString(index));
+//				String question = StaticVariable.questionsMap.get(Integer.toString(index));
+				String question = StaticVariable.questionsList.get(index - 1);
 				// 分割字符串，将题目答案等分离
 				String[] strs = question.split(",");
 				if ((strs.length - 4) > 0) {
@@ -569,8 +581,9 @@ public class MainFrame extends ApplicationWindow {
 		fileMenu.add(openFile);
 		// 添加分割线
 		fileMenu.add(new Separator());
-		fileMenu.add(saveFile);
-		fileMenu.add(saveAsFile);
+//		fileMenu.add(saveFile);
+//		fileMenu.add(saveAsFile);
+//		fileMenu.add(unsubscribe);
 		// 添加分割线
 		fileMenu.add(new Separator());
 		fileMenu.add(exit);
@@ -599,7 +612,8 @@ public class MainFrame extends ApplicationWindow {
 		ToolBarManager toolBarManager = new ToolBarManager(style);
 		// gtoolBarManager.add(new NewCreateAction());
 		toolBarManager.add(new OpenFileAction());
-		toolBarManager.add(new CreateXmlFile());
+		toolBarManager.add(new CreateXmlFileAction());
+		toolBarManager.add(new QuestionManagerAction());
 		toolBarManager.add(new NewCreateAction());
 		// toolBarManager.add(new SaveFileAction());
 		// toolBarManager.add(new Separator());
@@ -716,10 +730,10 @@ public class MainFrame extends ApplicationWindow {
 	 * @author wanli
 	 *
 	 */
-	class CreateXmlFile extends Action {
-		public CreateXmlFile() {
-			super("OpenFileAction@Ctrl+Shift+C", Action.AS_PUSH_BUTTON);
-			setText("备题");
+	class CreateXmlFileAction extends Action {
+		public CreateXmlFileAction() {
+			super("CreateXmlFileAction@Ctrl+Shift+C", Action.AS_PUSH_BUTTON);
+			setText("课前备题");
 			try {
 				// 载入图像
 				ImageDescriptor icon = ImageDescriptor.createFromURL(new URL("file:image/before_class.png"));
@@ -731,6 +745,24 @@ public class MainFrame extends ApplicationWindow {
 		
 		public void run() {
 			new PrepareLessons(StaticVariable.parent);
+		}
+	}
+	
+	class QuestionManagerAction extends Action {
+		public QuestionManagerAction() {
+			super("QuestionManagerAction@Ctrl+Shift+M", Action.AS_PUSH_BUTTON);
+			setText("问题管理");
+			try {
+				// 载入图像
+				ImageDescriptor icon = ImageDescriptor.createFromURL(new URL("file:image/manager.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				System.err.println(e.getMessage());
+			}
+		}
+		public void run() {
+//			new PrepareLessons(StaticVariable.parent);
+			new QuestionManagerShell(StaticVariable.parent);
 		}
 	}
 
@@ -776,6 +808,36 @@ public class MainFrame extends ApplicationWindow {
 
 		public void run() {
 			saveFileAs();
+		}
+	}
+	
+	/**
+	 * 注销账号
+	 * @author wanli
+	 *
+	 */
+	class UnsubscribeAction extends Action {
+		public UnsubscribeAction() {
+			super(" 注销账号@Ctrl+U", Action.AS_PUSH_BUTTON);
+			// 载入图像
+			ImageDescriptor icon;
+			try {
+				icon = ImageDescriptor.createFromURL(new URL("file:image/unsubscribe.png"));
+				setImageDescriptor(icon);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void run() {
+			MessageBox messageBox = new MessageBox(shell, SWT.YES | SWT.NO);
+			messageBox.setText("警告");
+			messageBox.setMessage("确定要注销当前账号吗？");
+			if (messageBox.open() == SWT.YES) {
+//				Display.getCurrent().dispose();
+				shell.dispose();
+				
+			}
 		}
 	}
 
@@ -1133,7 +1195,8 @@ public class MainFrame extends ApplicationWindow {
 		shell.setText(APPNAME + "-" + file);
 		String fileName = file.getName();
 		StaticVariable.tableName = fileName.substring(0, fileName.indexOf("."));
-		dbService.createTable(StaticVariable.questionsMap.size(), StaticVariable.tableName);
+//		dbService.createTable(StaticVariable.questionsMap.size(), StaticVariable.tableName);
+		dbService.createTable(StaticVariable.questionsList.size(), StaticVariable.tableName);
 //		try {
 //			
 //			// 读取文件

@@ -25,6 +25,12 @@ public class XmlToJavaBean {
 	}
 	
 	private void xmlToJava() {
+		// 每次重新选择文件时，都要先清空下拉框的内容
+		StaticVariable.questionSelect.removeAll();
+		// 清空存储所有类型题目的list
+		StaticVariable.allQuestionList.clear();
+		// 清空存储所有转换成String的题目的list
+		StaticVariable.questionsList.clear();
 		JAXBContext jaxbc;
 		try {
 			// xml要转化为javabean的类
@@ -42,14 +48,16 @@ public class XmlToJavaBean {
 			if (choiceQs != null && choiceQs.size() > 0) {
 				// 遍历所有的选择题
 				for (ChoiceQuestion choice: choiceQs) {
-					str.append(choice.getNo());
-					str.append("," + choice.getType());
+					StaticVariable.allQuestionList.add(choice);
+//					str.append(choice.getNo());
+					str.append(choice.getType());
 					str.append("," + choice.getQuestion());
 					str.append("," + choice.getAnswer());
 					for (int i = 0; i < choice.getOptions().size(); i++) {
 						str.append("," + choice.getOptions().get(i));
 					}
-					StaticVariable.questionsMap.put(choice.getNo(), str.toString());
+//					StaticVariable.questionsMap.put(choice.getNo(), str.toString());
+					StaticVariable.questionsList.add(str.toString());
 					// 清空StringBuffer
 					str.setLength(0);
 				}
@@ -59,11 +67,13 @@ public class XmlToJavaBean {
 			if (tofQs != null && tofQs.size() > 0) {
 				// 遍历所有的是非题
 				for (TrueOrFalse tof: tofQs) {
-					str.append(tof.getNo());
-					str.append("," + tof.getType());
+					StaticVariable.allQuestionList.add(tof);
+//					str.append(tof.getNo());
+					str.append(tof.getType());
 					str.append("," + tof.getQuestion());
 					str.append("," + tof.getAnswer());
-					StaticVariable.questionsMap.put(tof.getNo(), str.toString());
+//					StaticVariable.questionsMap.put(tof.getNo(), str.toString());
+					StaticVariable.questionsList.add(str.toString());
 					// 清空StringBuffer
 					str.setLength(0);
 				}
@@ -73,13 +83,15 @@ public class XmlToJavaBean {
 			if (fbQs != null && fbQs.size() > 0) {
 				// 遍历所有的填空题
 				for (FillInTheBlanks fb: fbQs) {
-					str.append(fb.getNo());
-					str.append("," + fb.getType());
+					StaticVariable.allQuestionList.add(fb);
+//					str.append(fb.getNo());
+					str.append(fb.getType());
 					str.append("," + fb.getQuestion());
 					for (int i = 0; i < fb.getAnswer().size(); i++) {
 						str.append("," + fb.getAnswer().get(i));
 					}
-					StaticVariable.questionsMap.put(fb.getNo(), str.toString());
+//					StaticVariable.questionsMap.put(fb.getNo(), str.toString());
+					StaticVariable.questionsList.add(str.toString());
 					// 清空StringBuffer
 					str.setLength(0);
 				}				
@@ -95,16 +107,20 @@ public class XmlToJavaBean {
 				}
 			});
 			// 遍历所有的问题
-			for (int i = 0; i < StaticVariable.questionsMap.size(); i++) {
-				String[] strs = StaticVariable.questionsMap.get(Integer.toString(i + 1)).split(",");
-				switch (strs[1]) {
+//			for (int i = 0; i < StaticVariable.questionsMap.size(); i++) {
+//				String[] strs = StaticVariable.questionsMap.get(Integer.toString(i + 1)).split(",");
+			for (int i = 0; i < StaticVariable.questionsList.size(); i++) {
+				String[] strs = StaticVariable.questionsList.get(i).split(",");
+				final int index = i + 1;
+				switch (strs[0]) {
 				// 选择题
 				case "choice":
 					Display.getDefault().syncExec(new Runnable() {
 						@Override
 						public void run() {
 							// 向问题选择下拉框添加项
-							StaticVariable.questionSelect.add(strs[0] + "-选择题");
+							StaticVariable.questionSelect.add(index + "-选择题");
+//							StaticVariable.questionSelect.add(strs[0] + "-选择题");
 						}
 					});
 					break;
@@ -114,7 +130,8 @@ public class XmlToJavaBean {
 						@Override
 						public void run() {
 							// 向问题选择下拉框添加项
-							StaticVariable.questionSelect.add(strs[0] + "-是非题");
+							StaticVariable.questionSelect.add(index + "-是非题");
+//							StaticVariable.questionSelect.add(strs[0] + "-是非题");
 						}
 					});
 					break;
@@ -124,7 +141,8 @@ public class XmlToJavaBean {
 						@Override
 						public void run() {
 							// 向问题选择下拉框添加项
-							StaticVariable.questionSelect.add(strs[0] + "-填空题");
+							StaticVariable.questionSelect.add(index + "-填空题");
+//							StaticVariable.questionSelect.add(strs[0] + "-填空题");
 						}
 					});
 					break;

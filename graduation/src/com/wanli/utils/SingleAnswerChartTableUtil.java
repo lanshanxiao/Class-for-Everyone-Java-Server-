@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.wb.swt.SWTResourceManager;
 import org.swtchart.Chart;
 import org.swtchart.ISeries;
 import org.swtchart.ISeries.SeriesType;
@@ -45,6 +46,7 @@ public class SingleAnswerChartTableUtil extends Dialog {
 	protected void createContents() {
 		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
         shell.setText("图表");
+        shell.setImage(SWTResourceManager.getImage("image/quesCount.png"));
         shell.setSize(800, 300);
         shell.setLayout(new FillLayout());
         createChart(shell);
@@ -84,7 +86,8 @@ public class SingleAnswerChartTableUtil extends Dialog {
 			ySeries[2] = StaticVariable.unResponse.get(0).intValue();
 			// 将答案保存到answer
 			int index = StaticVariable.questionSelect.getSelectionIndex();
-			String question = StaticVariable.questionsMap.get(Integer.toString(index));
+//			String question = StaticVariable.questionsMap.get(Integer.toString(index));
+			String question = StaticVariable.questionsList.get(index - 1);
 			String[] strs = question.split(",");
 			answer = strs[3];			
 		}
