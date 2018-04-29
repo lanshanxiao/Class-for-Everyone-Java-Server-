@@ -150,12 +150,12 @@ public class RegistUserAction extends ActionSupport implements RequestAware, Mod
 		HttpServletResponse response = ServletActionContext.getResponse();
 		String username = request.getParameter("username");
 		String randomNum = Randomutil.getRandom();
-//		try {
-//			SmsUtils.sendSms(username, randomNum);
-//		} catch (ClientException e) {
-//			e.printStackTrace();
-//			System.out.println("∂Ã–≈∑¢ÀÕ ß∞‹");
-//		}
+		try {
+			SmsUtils.sendSms(username, randomNum);
+		} catch (ClientException e) {
+			e.printStackTrace();
+			System.out.println("∂Ã–≈∑¢ÀÕ ß∞‹");
+		}
 		try {
 			response.getWriter().println(randomNum);
 		} catch (IOException e) {
