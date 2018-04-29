@@ -64,7 +64,11 @@ public class ServerThread implements Runnable {
 		ipAddress = s.getInetAddress().toString().substring(1);
 		// 采用循环不断从Socket中读取客户端发送过来的数据
 		while ((content = readFromClient()) != null) {
+<<<<<<< HEAD
+			System.out.println(content);
+=======
 			
+>>>>>>> fa5ef85e9666c0c35e4117db1ac219b0328c353c
 			String[] info = content.split(",");
 //			System.out.println(Arrays.toString(info));
 			switch(info[0]) {
