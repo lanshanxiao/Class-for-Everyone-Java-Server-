@@ -106,7 +106,7 @@ public class HistoryChartTableUtil extends Dialog {
 		// 字符串存储的格式：{答案1 答案2 答案3...,正确1  正确2 正确3...,错误1 错误2 错误3...,未回答1 未回答2 未回答3...}
 		// 将传过来的字符串使用“,”号分割
 		if (str != null && str != "") {
-			strs = str.split(",");			
+			strs = str.split("#\\^");			
 		} else {
 			return;
 		}

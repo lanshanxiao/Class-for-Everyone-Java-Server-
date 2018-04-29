@@ -71,7 +71,7 @@ public class ServerThread implements Runnable {
 		// 采用循环不断从Socket中读取客户端发送过来的数据
 		while ((content = readFromClient()) != null) {
 			
-			String[] info = content.split(",");
+			String[] info = content.split("#\\^");
 //			System.out.println(Arrays.toString(info));
 			switch(info[0]) {
 				// 读取注册信息
@@ -126,7 +126,7 @@ public class ServerThread implements Runnable {
 								StaticVariable.answers.replace(info[1], info[2]);
 								int index = StaticVariable.questionSelect.getSelectionIndex();
 //								String[] strs = StaticVariable.questionsMap.get(Integer.toString(index)).split(",");
-								String[] strs = StaticVariable.questionsList.get(index - 1).split(",");
+								String[] strs = StaticVariable.questionsList.get(index - 1).split("#\\^");
 								// answers.length > 1 表示有多个答案
 								if (answers.length > 1) {
 									// 多个答案用空隔分开，过滤掉多余的空隔
@@ -213,8 +213,8 @@ public class ServerThread implements Runnable {
 							} else {
 								MailUtils.sendMail(info[1], randomNum);
 							}
-//							// 注册过给客户端发送提示信息，并把验证码发送给客户端
-//							sendToClient("5," + randomNum);
+							// 注册过给客户端发送提示信息，并把验证码发送给客户端
+							sendToClient("5#^" + randomNum);
 						} else {
 							// 未注册过给客户端发送失败提示
 							sendToClient("5-false");

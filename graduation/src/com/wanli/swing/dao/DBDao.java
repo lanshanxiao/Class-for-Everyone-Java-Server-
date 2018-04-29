@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.wanli.swing.entities.QuestionType;
 import com.wanli.utils.DbUtilsScoreTab;
 import com.wanli.utils.StaticVariable;
 
@@ -22,17 +23,18 @@ public class DBDao {
 
 	/**
 	 * 创建表
-	 * @param num：num值指定创建的表有多少列
+	 * @param allQuestionLista：存储所有问题的list
+	 * @param stableName:创建的表名
 	 */
-	public void createTable(int num, String tableName) {
+	public void createTable(List<QuestionType> allQuestionList, String tableName) {
 		List<String> titles = new ArrayList<>();
 		String title = "title";
 		String sql = "create table " + tableName + "(username char(30), ";
 		PreparedStatement statement = null;
 		Connection connection = DbUtilsScoreTab.getConnection();
-		for (int i = 1; i <= num; i++) {
+		for (int i = 1; i <= allQuestionList.size(); i++) {
 			titles.add(title + i);
-			if (i == num) {
+			if (i == allQuestionList.size()) {
 				sql = sql + titles.get(i - 1) + " char(30))";
 				break;
 			}
@@ -43,10 +45,58 @@ public class DBDao {
 			statement = connection.prepareStatement(sql);
 			statement.execute();
 			StaticVariable.firstInsert = true;
+			addTypeData(allQuestionList, tableName);
 		} catch (SQLException e) {
 //			e.printStackTrace();
 			System.out.println("创建表失败，表已经存在！请修改文件名，以保证建表成功。");
 			StaticVariable.firstInsert = false;
+		}
+	}
+	
+	/**
+	 * 添加类型数据
+	 * @param allQuestionList
+	 * @param tableName
+	 */
+	public void addTypeData(List<QuestionType> allQuestionList, String tableName) {
+		PreparedStatement statement = null;
+		StringBuilder sql = new StringBuilder();
+		sql.append("insert into " + tableName + " values('type',");
+		for (int i = 0; i < allQuestionList.size(); i++) {
+			String type = allQuestionList.get(i).getType();
+			switch (type) {
+			case "choice":
+				if (i == allQuestionList.size() - 1) {
+					sql.append("'choice')");					
+				} else {
+					sql.append("'choice',");
+				}
+				break;
+
+			case "true_or_false":
+				if (i == allQuestionList.size() - 1) {
+					sql.append("'true_or_false')");					
+				} else {
+					sql.append("'true_or_false',");					
+				}
+				break;
+				
+			case "fill_in_the_blanks":
+				if (i == allQuestionList.size() - 1) {
+					sql.append("'fill_in_the_blanks')");					
+				} else {
+					sql.append("'fill_in_the_blanks',");					
+				}
+				break;
+			}
+		}
+		Connection connection = DbUtilsScoreTab.getConnection();
+		try {
+			statement = connection.prepareStatement(sql.toString());
+			statement.execute();
+		} catch (SQLException e) {
+			System.out.println("数据库连接失败！");
+			e.printStackTrace();
 		}
 	}
 	

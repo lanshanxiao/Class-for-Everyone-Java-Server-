@@ -33,7 +33,7 @@ public class UpdateQuestionBasic {
 	
 	public void addComposite() {
 		String question = StaticVariable.questionsList.get(i);
-		String[] strs = question.split(",");
+		String[] strs = question.split("#\\^");
 		// 设置窗体布局为网格式布局，且分成两列
 		child.setLayout(new GridLayout(2, false));
 		GridData choiceGrid = new GridData(GridData.FILL_BOTH);

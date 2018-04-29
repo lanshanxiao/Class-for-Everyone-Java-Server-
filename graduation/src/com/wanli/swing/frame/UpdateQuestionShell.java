@@ -107,7 +107,7 @@ class UpdateShell extends Dialog {
 	
 	protected void createShell(Composite parent) {
 		String question = StaticVariable.questionsList.get(i);
-		String[] strs = question.split(",");
+		String[] strs = question.split("#\\^");
 		// 判断题目类型
 		switch (strs[0]) {
 		// 选择题

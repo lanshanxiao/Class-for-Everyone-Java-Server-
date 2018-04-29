@@ -50,7 +50,7 @@ public class QuestionSelectComboListener implements SelectionListener {
 //			String question = StaticVariable.questionsMap.get(Integer.toString(index));
 			String question = StaticVariable.questionsList.get(index - 1);
 			// 分割字符串，将题目答案等分离
-			String[] strs = question.split(",");
+			String[] strs = question.split("#\\^");
 			if ((strs.length - 3) > 0) {
 				// (strs.length - 3) > 0表示有多个答案
 				StringBuffer answer = new StringBuffer();	// 存储问题的答案
@@ -112,7 +112,7 @@ public class QuestionSelectComboListener implements SelectionListener {
 //				question = StaticVariable.questionsMap.get(Integer.toString(index));
 				question = StaticVariable.questionsList.get(index - 1);
 				// 分割题目
-				strs = question.split(",");
+				strs = question.split("#\\^");
 				// 重组题目
 				showQues.append("选择题:\n\n");
 				showQues.append(strs[1]);
@@ -135,7 +135,7 @@ public class QuestionSelectComboListener implements SelectionListener {
 				showQues.setLength(0);
 //				question = StaticVariable.questionsMap.get(Integer.toString(index));
 				question = StaticVariable.questionsList.get(index - 1);
-				strs = question.split(",");
+				strs = question.split("#\\^");
 				showQues.append("是非题:\n\n");
 				showQues.append(strs[1]);
 				StaticVariable.text.setText(showQues.toString());
@@ -149,7 +149,7 @@ public class QuestionSelectComboListener implements SelectionListener {
 				showQues.setLength(0);
 //				question = StaticVariable.questionsMap.get(Integer.toString(index));
 				question = StaticVariable.questionsList.get(index - 1);
-				strs = question.split(",");
+				strs = question.split("#\\^");
 				showQues.append("填空题:\n\n");
 				showQues.append(strs[1]);
 				StaticVariable.text.setText(showQues.toString());

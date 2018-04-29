@@ -1,6 +1,7 @@
 package com.wanli.utils;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -51,13 +52,14 @@ public class XmlToJavaBean {
 					StaticVariable.allQuestionList.add(choice);
 //					str.append(choice.getNo());
 					str.append(choice.getType());
-					str.append("," + choice.getQuestion());
-					str.append("," + choice.getAnswer());
+					str.append("#^" + choice.getQuestion());
+					str.append("#^" + choice.getAnswer());
 					for (int i = 0; i < choice.getOptions().size(); i++) {
-						str.append("," + choice.getOptions().get(i));
+						str.append("#^" + choice.getOptions().get(i));
 					}
 //					StaticVariable.questionsMap.put(choice.getNo(), str.toString());
 					StaticVariable.questionsList.add(str.toString());
+//					System.out.println(str.toString());
 					// 清空StringBuffer
 					str.setLength(0);
 				}
@@ -70,8 +72,8 @@ public class XmlToJavaBean {
 					StaticVariable.allQuestionList.add(tof);
 //					str.append(tof.getNo());
 					str.append(tof.getType());
-					str.append("," + tof.getQuestion());
-					str.append("," + tof.getAnswer());
+					str.append("#^" + tof.getQuestion());
+					str.append("#^" + tof.getAnswer());
 //					StaticVariable.questionsMap.put(tof.getNo(), str.toString());
 					StaticVariable.questionsList.add(str.toString());
 					// 清空StringBuffer
@@ -86,9 +88,9 @@ public class XmlToJavaBean {
 					StaticVariable.allQuestionList.add(fb);
 //					str.append(fb.getNo());
 					str.append(fb.getType());
-					str.append("," + fb.getQuestion());
+					str.append("#^" + fb.getQuestion());
 					for (int i = 0; i < fb.getAnswer().size(); i++) {
-						str.append("," + fb.getAnswer().get(i));
+						str.append("#^" + fb.getAnswer().get(i));
 					}
 //					StaticVariable.questionsMap.put(fb.getNo(), str.toString());
 					StaticVariable.questionsList.add(str.toString());
@@ -110,8 +112,9 @@ public class XmlToJavaBean {
 //			for (int i = 0; i < StaticVariable.questionsMap.size(); i++) {
 //				String[] strs = StaticVariable.questionsMap.get(Integer.toString(i + 1)).split(",");
 			for (int i = 0; i < StaticVariable.questionsList.size(); i++) {
-				String[] strs = StaticVariable.questionsList.get(i).split(",");
+				String[] strs = StaticVariable.questionsList.get(i).split("#\\^");
 				final int index = i + 1;
+				System.out.println(strs[0]);
 				switch (strs[0]) {
 				// 选择题
 				case "choice":

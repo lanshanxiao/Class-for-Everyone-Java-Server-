@@ -76,7 +76,7 @@ public class OpenFileDialogBtnListener implements SelectionListener {
 			// 分割题目字符串
 //			String question = StaticVariable.questionsMap.get(Integer.toString(i + 1));
 			String question = StaticVariable.questionsList.get(i);
-			String[] strs = question.split(",");
+			String[] strs = question.split("#\\^");
 			// 设置第二列的text
 			items[i].setText(1, strs[1]);
 			// 创建两个TableEditor对象，用于放置两个按钮

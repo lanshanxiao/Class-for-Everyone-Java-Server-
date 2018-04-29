@@ -45,7 +45,7 @@ public class UpdateChoiceComposite extends Composite {
 
 	public void addComposite() {
 		String question = StaticVariable.questionsList.get(i);
-		String[] strs = question.split(",");
+		String[] strs = question.split("#\\^");
 		// 设置面板布局
 		UpdateChoiceComposite choiceCom = this;
 		choiceCom.setLayout(new GridLayout(2, false));

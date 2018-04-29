@@ -53,7 +53,7 @@ public class TabFordlerListener extends SelectionAdapter {
 //				String question = StaticVariable.questionsMap.get(Integer.toString(index));
 				// question格式：题目类型，题目，答案1，答案2... 
 				String question = StaticVariable.questionsList.get(index - 1);
-				String[] strs = question.split(",");
+				String[] strs = question.split("#\\^");
 				if (strs[0].equals("fill_in_the_blanks")) {
 					// 判断是否有多个答案
 					if ((strs.length - 3) > 0) {

@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import com.wanli.swing.entities.ChoiceQuestion;
 import com.wanli.swing.entities.FillInTheBlanks;
 import com.wanli.swing.entities.OnlineUser;
+import com.wanli.swing.entities.QuestionType;
 import com.wanli.swing.entities.TrueOrFalse;
 
 /**
@@ -77,5 +78,5 @@ public class StaticVariable {
 	public static boolean firstInsert = true;							// 往成绩表中插入数据，用来标记是否是第一次插入
 	public static List<String> statisticalData;							// 存储所有统计数据
 	public static Table table;											// 管理问题的表格
-	public static List allQuestionList = new ArrayList<>();				// 存储任意题型的list
+	public static List<QuestionType> allQuestionList = new ArrayList<>();				// 存储任意题型的list
 }

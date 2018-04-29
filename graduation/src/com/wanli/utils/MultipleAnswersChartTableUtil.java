@@ -117,7 +117,7 @@ public class MultipleAnswersChartTableUtil extends Dialog {
 			int index = StaticVariable.questionSelect.getSelectionIndex();
 //			String question = StaticVariable.questionsMap.get(Integer.toString(index));
 			String question = StaticVariable.questionsList.get(index - 1);
-			String[] strs = question.split(",");
+			String[] strs = question.split("#\\^");
 			cagetorySeries[i] = strs[i + 3];
 		}
 	}

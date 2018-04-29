@@ -526,7 +526,7 @@ public class MainFrame extends ApplicationWindow {
 //				String question = StaticVariable.questionsMap.get(Integer.toString(index));
 				String question = StaticVariable.questionsList.get(index - 1);
 				// 分割字符串，将题目答案等分离
-				String[] strs = question.split(",");
+				String[] strs = question.split("#\\^");
 				if ((strs.length - 4) > 0) {
 					// (strs.length - 4) > 0表示有多个答案
 					StringBuffer answer = new StringBuffer();	// 存储问题的答案
@@ -1196,7 +1196,7 @@ public class MainFrame extends ApplicationWindow {
 		String fileName = file.getName();
 		StaticVariable.tableName = fileName.substring(0, fileName.indexOf("."));
 //		dbService.createTable(StaticVariable.questionsMap.size(), StaticVariable.tableName);
-		dbService.createTable(StaticVariable.questionsList.size(), StaticVariable.tableName);
+		dbService.createTable(StaticVariable.allQuestionList, StaticVariable.tableName);
 //		try {
 //			
 //			// 读取文件
