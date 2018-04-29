@@ -44,14 +44,14 @@ System.out.println(s.getInetAddress().toString());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-//			if (s != null) {
-//				System.out.println("客户端连接成功！！！");
+			if (s != null) {
+				System.out.println("客户端连接成功！！！");
 //				try {
 //					
 //				} catch (IOException e) {
 //					e.printStackTrace();
 //				}
-//			}
+			}
 			//每当客户端连接后启动一条ServerThread线程为该客户端服务
 			try {
 				new Thread(new ServerThread(s)).start();

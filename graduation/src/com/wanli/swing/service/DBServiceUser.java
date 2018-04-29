@@ -52,4 +52,13 @@ public class DBServiceUser {
 		return daoUser.getByUsername(username);
 	}
 	
+	/**
+	 * 根据手机号码或者邮箱获取用户的昵称
+	 * @param username
+	 * @return
+	 */
+	public String getNicknameByPhoneOrEmail(String username) {
+		return daoUser.getNicknameByPhoneOrEmail(username);
+	}
+	
 }

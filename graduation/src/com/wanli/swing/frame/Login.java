@@ -79,7 +79,7 @@ public class Login {
 		keys = itSet.iterator();
 	}
 	
-	protected static void onCreate() {
+	public static void onCreate() {
 		display = Display.getDefault();
 		shell = new Shell(display, SWT.DIALOG_TRIM);
 		shell.setImage(SWTResourceManager.getImage("image/1.jpg"));
@@ -104,21 +104,21 @@ public class Login {
 
 		// 输入用户名，用下拉框显示历史登录信息
 		Combo comboUser = new Combo(loginComposite, SWT.NONE);
-		comboUser.setBounds(162, 24, 202, 32);
+		comboUser.setBounds(120, 24, 220, 32);
 		
 		// 密码输入框
 		textPassword = new Text(loginComposite, SWT.BORDER | SWT.PASSWORD);
-		textPassword.setBounds(162, 55, 202, 25);
+		textPassword.setBounds(120, 55, 220, 32);
 		
 		// 复选框，保存密码
 		Button bRememberMe = new Button(loginComposite, SWT.CHECK);
-		bRememberMe.setBounds(162, 93, 92, 28);
+		bRememberMe.setBounds(120, 93, 100, 28);
 		bRememberMe.setForeground(SWTResourceManager.getColor(240, 248, 255));
 		bRememberMe.setText("\u8BB0\u4F4F\u5BC6\u7801");
 		
 		// 复选框，自动登录
 		Button bAutoLogin = new Button(loginComposite, SWT.CHECK);
-		bAutoLogin.setBounds(280, 93, 84, 28);
+		bAutoLogin.setBounds(240, 93, 100, 28);
 		bAutoLogin.setForeground(SWTResourceManager.getColor(240, 248, 255));
 		bAutoLogin.setText("\u81EA\u52A8\u767B\u5F55");
 		
@@ -147,7 +147,7 @@ public class Login {
 
 		// 注册帐号链接
 		Link linkRegist = new Link(loginComposite, SWT.NONE);
-		linkRegist.setBounds(370, 24, 72, 25);
+		linkRegist.setBounds(350, 24, 100, 25);
 		linkRegist.setText("<a>\u6CE8\u518C\u8D26\u53F7</a>");
 		// 为超链接添加点击事件
 		linkRegist.addMouseListener(new MouseListener() {
@@ -181,7 +181,7 @@ public class Login {
 
 		// 忘记密码超链接
 		Link linkForget = new Link(loginComposite, SWT.NONE);
-		linkForget.setBounds(370, 55, 72, 25);
+		linkForget.setBounds(350, 55, 100, 25);
 		linkForget.setText("<a>\u627E\u56DE\u5BC6\u7801</a>");
 		// 为超链接添加点击事件
 		linkForget.addMouseListener(new MouseListener() {
@@ -215,7 +215,7 @@ public class Login {
 
 		// 登录按钮
 		Button bLogin = new Button(loginComposite, SWT.NONE);
-		bLogin.setBounds(162, 137, 202, 27);
+		bLogin.setBounds(120, 137, 220, 27);
 		bLogin.setText("\u767B\u5F55");
 
 		// 登录用户头像
@@ -304,7 +304,7 @@ public class Login {
 				display.sleep();
 			}
 		}
-
+		System.exit(0);
 	}
 	
 	/**
@@ -336,4 +336,13 @@ public class Login {
 	public void setCoverImg(Image coverImg) {
 		this.coverImg = coverImg;
 	}
+
+	public static Shell getShell() {
+		return shell;
+	}
+
+	public static void setShell(Shell shell) {
+		Login.shell = shell;
+	}
+	
 }

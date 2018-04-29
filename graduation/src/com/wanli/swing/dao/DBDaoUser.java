@@ -142,12 +142,42 @@ public class DBDaoUser {
 		return false;
 	}
 	
+	/**
+	 * 根据手机号码或者邮箱获取用户的昵称
+	 * @param username
+	 * @return
+	 */
+	public String getNicknameByPhoneOrEmail(String username) {
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		String sql = "";
+		boolean result = username.matches("[0-9]+");
+		if (result) {
+			sql = "select nickname from userbean where name = ?";			
+		} else {
+			sql = "select nickname from userbean where email = ?";
+		}
+		Connection connection = DBUtilsUser.getConnection();
+		try {
+			statement = connection.prepareStatement(sql);
+			statement.setString(1, username);
+			resultSet = statement.executeQuery();
+			if (resultSet.next()) {
+				return resultSet.getString(1);
+			}
+		} catch (SQLException e) {
+			System.out.println("数据库连接失败！！！");
+			e.printStackTrace();
+		}
+		return null;
+	}
 	public static void main(String[] args) {
 		DBDaoUser daoUser = new DBDaoUser();
 //		String[] user = {"14433333333", "陈文豪3141904210", "123456", "RRT@qq.com"};
 //		daoUser.addUser(user);
 //		System.out.println(daoUser.getUserByNameAndPassword("124@qq.com", "123456"));;
-		System.out.println(daoUser.getByUsername("17759083295"));
+//		System.out.println(daoUser.getByUsername("17759083295"));
+		System.out.println(daoUser.getNicknameByPhoneOrEmail("13344444444"));
 	}
 	
 }

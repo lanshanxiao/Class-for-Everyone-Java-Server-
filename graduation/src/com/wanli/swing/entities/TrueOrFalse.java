@@ -1,20 +1,19 @@
 package com.wanli.swing.entities;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "true_or_false")
-public class TrueOrFalse {
+public class TrueOrFalse implements QuestionType {
 
-	private String no;							// 题目编号
+//	private String no;							// 题目编号
 	private String question;					// 题目
 	private String type = "true_or_false"; 		// 类型：填空题
 	private String answer;						// 答案
 	
 	public TrueOrFalse(String no, String question, String answer) {
 		super();
-		this.no = no;
+//		this.no = no;
 		this.question = question;
 		this.answer = answer;
 	}
@@ -22,13 +21,13 @@ public class TrueOrFalse {
 	public TrueOrFalse() {
 	}
 	
-	@XmlAttribute(name = "no")
-	public String getNo() {
-		return no;
-	}
-	public void setNo(String no) {
-		this.no = no;
-	}
+//	@XmlAttribute(name = "no")
+//	public String getNo() {
+//		return no;
+//	}
+//	public void setNo(String no) {
+//		this.no = no;
+//	}
 	
 	@XmlElement(name = "question")
 	public String getQuestion() {
@@ -56,7 +55,7 @@ public class TrueOrFalse {
 
 	@Override
 	public String toString() {
-		return "TrueOrFalse [no=" + no + ", question=" + question + ", type=" + type + ", answer=" + answer + "]";
+		return "TrueOrFalse [question=" + question + ", type=" + type + ", answer=" + answer + "]";
 	}
 	
 	

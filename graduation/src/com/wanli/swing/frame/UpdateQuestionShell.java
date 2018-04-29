@@ -4,50 +4,53 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-import com.wanli.swing.frame.listener.CreateXmlFileBtnListener;
-import com.wanli.swing.frame.listener.QuestionTypeListener;
-import com.wanli.swing.frame.questiontype.BeginningComposite;
+import com.wanli.swing.frame.updateQuestion.UpdateChoiceComposite;
+import com.wanli.swing.frame.updateQuestion.UpdateFillInTheBlanksComposite;
+import com.wanli.swing.frame.updateQuestion.UpdateTrueOrFalseComposite;
 import com.wanli.utils.StaticVariable;
 
 /**
- * 备课对话框
+ * 修改问题对话框
  * @author wanli
  *
  */
-public class PrepareLessons {
+public class UpdateQuestionShell {
 
-	private Composite parent;	// 存储一切与主窗口相关的信息
+	private Composite parent;	// 有父窗体一切信息的面板
+	private int i;				// 修改的题目的list下标
+	private String openFile;	// 打开的文件名
 	
-	public PrepareLessons(Composite parent) {
+	public UpdateQuestionShell(Composite parent, int i, String openFile) {
 		this.parent = parent;
-		// 执行窗口弹出
-		new PrepareShell(parent.getShell()).open();
-		// 每次成功创建xml文件或者关闭创建文件的窗口都有清空所有存储题目的list
-		StaticVariable.choiceList.clear();
-		StaticVariable.trueOrFalseList.clear();
-		StaticVariable.fillblanksList.clear();
+		this.i = i;
+		this.openFile = openFile;
+		new UpdateShell(parent.getShell(), i, openFile).open();
 	}
-	
 }
 
-class PrepareShell extends Dialog {
+/**
+ * 弹出框
+ * @author wanli
+ *
+ */
+class UpdateShell extends Dialog {
 
 	protected Object result;
 	protected Shell shell;
-//	private Composite questionCom;
+	private int i;
+	private String openFile;
 	
-	public PrepareShell(Shell shell) {
+	public UpdateShell(Shell shell, int i, String openFile) {
 		super(shell);
+		this.i = i;
+		this.openFile = openFile;
 	}
 	
 	public Object open() {
@@ -68,7 +71,7 @@ class PrepareShell extends Dialog {
 	protected void createContents() {
 		// 创建一个窗口
 		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
-        shell.setText("课前备题");
+        shell.setText("问题修改");
         shell.setSize(800, 800);
         
         shell.addShellListener(new ShellAdapter() {
@@ -99,29 +102,27 @@ class PrepareShell extends Dialog {
         gridLayout.marginRight = 40;
         // 设置窗口布局
         shell.setLayout(gridLayout);
-        createClass(shell);
+        createShell(shell);
 	}
 	
-	protected void createClass(Composite parent) {
-		// 选择题型下拉列表框
-		Combo questionType = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
-		questionType.add("请选择题型");
-		questionType.add("选择题");
-		questionType.add("是非题");
-		questionType.add("填空题");
-		questionType.select(0);
-		questionType.addSelectionListener(new QuestionTypeListener(parent, questionType));
-
-		// 创建Xml文件按钮
-		Button create = new Button(parent, SWT.NONE);
-		create.setText("创    建");
-		create.addSelectionListener(new CreateXmlFileBtnListener(shell));
-
-		// 设置下拉框控件和创建按钮的布局
-		GridData fill = new GridData(GridData.FILL_HORIZONTAL);
-		questionType.setLayoutData(fill);
-		create.setLayoutData(fill);
-		StaticVariable.questionCom = new BeginningComposite(parent, SWT.NONE);
+	protected void createShell(Composite parent) {
+		String question = StaticVariable.questionsList.get(i);
+		String[] strs = question.split("#\\^");
+		// 判断题目类型
+		switch (strs[0]) {
+		// 选择题
+		case "choice":
+			StaticVariable.questionCom = new UpdateChoiceComposite(parent, SWT.BORDER, i, openFile);			
+			break;
+		// 是非题
+		case "true_or_false":
+			StaticVariable.questionCom = new UpdateTrueOrFalseComposite(parent, SWT.BORDER, i, openFile);
+			break;
+		// 填空题
+		case "fill_in_the_blanks":
+			StaticVariable.questionCom = new UpdateFillInTheBlanksComposite(parent, SWT.BORDER, i, openFile);
+			break;
+		}
 	}
 	
 	/**
@@ -136,5 +137,6 @@ class PrepareShell extends Dialog {
 		int y = bounds.y + (bounds.height - rect.height) / 2;
 		shell.setLocation(x, y);
 	}
-	
 }
+
+

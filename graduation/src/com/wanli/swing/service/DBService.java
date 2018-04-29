@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wanli.swing.dao.DBDao;
+import com.wanli.swing.entities.QuestionType;
 
 public class DBService {
 
@@ -15,11 +16,11 @@ public class DBService {
 	
 	/**
 	 * 创建表
-	 * @param num：指定列数
+	 * @param allQuestionList：存储所有问题的list
 	 * @param tableName：指定表名
 	 */
-	public void createTable(int num, String tableName) {
-		dbDao.createTable(num, tableName);
+	public void createTable(List<QuestionType> allQuestionList, String tableName) {
+		dbDao.createTable(allQuestionList, tableName);
 	}
 	
 	/**
